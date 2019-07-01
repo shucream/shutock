@@ -1,4 +1,4 @@
-class Api::V1::ShopsController < ApplicationController
+class V1::ShopsController < ApplicationController
 
     def index
 
