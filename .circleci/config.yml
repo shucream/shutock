@@ -26,6 +26,7 @@ jobs:
           MYSQL_ROOT_PASSWORD: root
     working_directory: $APP_ROOT
     steps:
+      - checkout
       - run:
         name: Install dockerize
         command: |
@@ -54,6 +55,7 @@ jobs:
           DATABASE_PASSWORD: root
     working_directory: $APP_ROOT
     steps:
+      - checkout
       - run:
         name: Code check by Rubocop
         command: bundle exec rubocop
