@@ -7,6 +7,13 @@ orbs:
 
 jobs:
 
+  build:
+    steps:
+      - aws-ecr/build-and-push-image:
+          name: build-test
+          repo: $AWS_RESOURCE_NAME_PREFIX
+          tag: $CONTAINER_IMAGE:test-$CIRCLE_SHA1
+
   test:
     docker:
       - image: $CONTAINER_IMAGE:test-$CIRCLE_SHA1
@@ -59,11 +66,6 @@ workflows:
   workflow:
     jobs:
       - build
-        jobs:
-          - aws-ecr/build-and-push-image:
-              name: build-test
-              repo: $AWS_RESOURCE_NAME_PREFIX
-              tag: $CONTAINER_IMAGE:test-$CIRCLE_SHA1
       - test:
         requires:
           - build
