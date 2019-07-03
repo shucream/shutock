@@ -9,13 +9,13 @@ jobs:
 
     build:
         - aws-ecr/build-and-push-image:
-            name: build-test
-            repo: $ECR_REPO
-            tag: $CONTAINER_IMAGE:test-$CIRCLE_SHA1
+            name: "build-test"
+            repo: "${ECR_REPO}"
+            tag: "${CONTAINER_IMAGE}:test-${CIRCLE_SHA1}"
 
     test:
         docker:
-            - image: $CONTAINER_IMAGE:test-$CIRCLE_SHA1
+            - image: "${CONTAINER_IMAGE}:test-${CIRCLE_SHA1}"
                 environment:
                     RAILS_ENV: test
                     DATABASE_HOST: 127.0.0.1
@@ -46,7 +46,7 @@ jobs:
 
     code-check:
         docker:
-            - image: $CONTAINER_IMAGE:test-$CIRCLE_SHA1
+            - image: "${CONTAINER_IMAGE}:test-${CIRCLE_SHA1}"
                 environment:
                     RAILS_ENV: test
                     DATABASE_HOST: 127.0.0.1
