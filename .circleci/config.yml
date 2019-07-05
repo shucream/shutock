@@ -1,7 +1,7 @@
 version: 2
 jobs:
   test:
-    working_directory: ~/mblog
+    working_directory: ~/shutock
     docker:
       - image: circleci/ruby:2.5.3-node
         environment:
