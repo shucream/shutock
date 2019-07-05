@@ -5,7 +5,7 @@ class V1::ProductsController < ApplicationController
   end
 
   def index
-    render status: 200, json: { status: 200, message: Product.all.to_s }
+    render json: Product.all, each_serializer: V1::ProductSerializer, include: '**'
   end
 
   def show; end
