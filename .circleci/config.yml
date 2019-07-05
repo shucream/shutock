@@ -12,20 +12,20 @@ jobs:
 
     steps:
       - checkout
-#      - restore_cache:
-#          keys:
-#            - mblog-{{ checksum "Gemfile.lock" }}
+      - restore_cache:
+          keys:
+            - shutock-{{ checksum "Gemfile.lock" }}
 
       - run:
           name: Run bundle install
           command: bundle install --jobs=4 --retry=3 --path=vendor/bundle --clean
 
-#      - save_cache:
-#          key: mblog-{{ checksum "Gemfile.lock" }}
-#          paths:
-#            - vendor/bundle
+      - save_cache:
+          key: shutock-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
 
-      # Wait for DB
+      # DBの起動待ち
       - run: dockerize -wait tcp://localhost:3306 -timeout 1m
 
       - run: bundle exec rails db:create db:migrate
