@@ -1,11 +1,5 @@
 class V1::ShopsController < ApplicationController
+  def index; end
 
-    def index
-
-    end
-
-    def show
-
-    end
-
+  def show; end
 end
