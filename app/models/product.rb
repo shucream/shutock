@@ -1,6 +1,6 @@
 class Product < ApplicationRecord
   has_many :stocks
-  has_many :shop, through: :stocks
+  has_many :shops, through: :stocks
 
   validates :name, presence: true, length: { maximum: 100 }
   validates :description, length: { maximum: 500 }

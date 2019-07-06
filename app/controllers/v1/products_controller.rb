@@ -8,7 +8,10 @@ class V1::ProductsController < ApplicationController
     render json: Product.all, each_serializer: V1::ProductSerializer, include: '**'
   end
 
-  def show; end
+  def show
+    @product = Product.find(params[:id])
+    render json: @product, serializer: V1::ProductSerializer
+  end
 
   def update; end
 
