@@ -1,7 +1,16 @@
 class V1::ProductsController < ApplicationController
   def create
-    @product = Product.create!(name: create_product_params[:name], price: create_product_params[:price].to_i)
-    render status: 200, json: { status: 200, message: @product.to_s }
+    @product = Product.new(
+        name: create_product_params[:name],
+        description: create_product_params[:description],
+        price: create_product_params[:price].to_i
+    )
+    @product.stocks.new(
+        shop_id: create_product_params[:shop_id].to_i,
+        quantity: create_product_params[:quantity]
+    )
+    @product.save!
+    render status: 200, json: @product
   end
 
   def index
@@ -20,6 +29,6 @@ class V1::ProductsController < ApplicationController
   private
 
   def create_product_params
-    params.permit(:name, :description, :price)
+    params.permit(:name, :description, :price, :shop_id, :quantity)
   end
 end
