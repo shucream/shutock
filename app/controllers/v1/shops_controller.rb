@@ -1,7 +1,7 @@
 class V1::ShopsController < ApplicationController
 
   def index
-    render json: Shop.all, each_serializer: V1::ShopSerializer, include: { stocks: [ :product ] }
+    render json: Shop.all, each_serializer: V1::ShopSerializer, include: {}
   end
 
   def show
