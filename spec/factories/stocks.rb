@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :stock do
-    product { nil }
-    shop { nil }
+    product { FactoryBot.create(:product) }
+    shop { FactoryBot.create(:shop) }
     quantity { 1 }
   end
 end

@@ -21,20 +21,20 @@ ActiveRecord::Schema.define(version: 2019_07_05_183812) do
   end
 
   create_table "shops", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "name"
+    t.string "name", null: false
     t.string "address"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "stocks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.bigint "product_id"
-    t.bigint "shop_id"
-    t.integer "quantity"
+    t.bigint "product_id", null: false
+    t.bigint "shop_id", null: false
+    t.integer "quantity", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["product_id"], name: "index_stocks_on_product_id"
-    t.index ["shop_id"], name: "index_stocks_on_shop_id"
+    t.index ["product_id", "shop_id"], name: "index_stocks_on_product_id_and_shop_id", unique: true
+    t.index ["shop_id"], name: "fk_rails_d8eb88b3bf"
   end
 
   add_foreign_key "stocks", "products"

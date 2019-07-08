@@ -1,5 +1,5 @@
 class Product < ApplicationRecord
-  has_many :stocks
+  has_many :stocks, dependent: :delete_all
   has_many :shops, through: :stocks
 
   validates :name, presence: true, length: { maximum: 100 }
