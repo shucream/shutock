@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Product, type: :model do
-  describe 'バリデーション' do
+  describe '入力バリデーション' do
     let(:build_product) { build(:product) }
 
     it 'nameがnilだとinvalid' do
@@ -27,6 +27,13 @@ RSpec.describe Product, type: :model do
     it 'descriptionが500文字以内でvalid' do
       build_product.description = 'a' * 500
       expect(build_product).to be_valid
+    end
+  end
+  describe '削除時' do
+    let(:stock) { create(:stock) }
+    it 'Product削除時に関連するStockが削除される' do
+      product = stock.product
+      expect { product.destroy }.to change { Stock.count }.by(-1)
     end
   end
 end

@@ -4,6 +4,7 @@ services:
         image: mysql:5.7
         environment:
             MYSQL_DATABASE: root
+            MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
         ports:
             - "3306:3306"
         networks:
@@ -14,6 +15,8 @@ services:
         command: bundle exec rails s -p 3000 -b '0.0.0.0'
         volumes:
             - .:/usr/src/shutock
+            - ./vender:/usr/local/vender
+
         ports:
             - "3000:3000"
         networks:
