@@ -5,8 +5,8 @@ RSpec.describe Shop, type: :model do
     @stock = create(:stock)
   end
 
-  it "Shop削除時に関連するStockが削除される" do
+  it 'Shop削除時に関連するStockが削除される' do
     shop = @stock.shop
-    expect{ shop.destroy }.to change { Stock.count }.by(-1)
+    expect { shop.destroy }.to change { Stock.count }.by(-1)
   end
 end

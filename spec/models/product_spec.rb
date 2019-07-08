@@ -29,11 +29,11 @@ RSpec.describe Product, type: :model do
       expect(build_product).to be_valid
     end
   end
-  describe "削除時" do
-    let(:stock) {create(:stock)}
-    it "Product削除時に関連するStockが削除される" do
+  describe '削除時' do
+    let(:stock) { create(:stock) }
+    it 'Product削除時に関連するStockが削除される' do
       product = stock.product
-      expect{ product.destroy }.to change { Stock.count }.by(-1)
+      expect { product.destroy }.to change { Stock.count }.by(-1)
     end
   end
 end
