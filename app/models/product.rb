@@ -1,6 +1,7 @@
 class Product < ApplicationRecord
   has_many :stocks, dependent: :delete_all
   has_many :shops, through: :stocks
+  has_many :product_images, dependent: :delete_all
 
   validates :name, presence: true, uniqueness: true, length: { maximum: 100 }
   validates :description, length: { maximum: 500 }
