@@ -29,11 +29,23 @@ RSpec.describe Product, type: :model do
       expect(build_product).to be_valid
     end
   end
-  describe '削除時' do
-    let(:stock) { create(:stock) }
-    it 'Product削除時に関連するStockが削除される' do
-      product = stock.product
-      expect { product.destroy }.to change { Stock.count }.by(-1)
+
+  describe '削除' do
+    context 'Stock' do
+      let(:stock) { create(:stock) }
+      it 'Product削除時に関連するStockが削除される' do
+        product = stock.product
+        expect { product.destroy }.to change { Stock.count }.by(-1)
+      end
     end
+
+    context 'ProductImage' do
+      let(:image) { create(:product_image)}
+      it 'Product削除時に関連するProductImageが削除される' do
+        product = image.product
+        expect { product.destroy }.to change { ProductImage.count }.by(-1)
+      end
+    end
+
   end
 end
