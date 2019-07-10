@@ -12,15 +12,24 @@ services:
 
     api:
         build: .
-        command: bundle exec rails s -p 3000 -b '0.0.0.0'
+        command: bundle exec rails s -p 8080 -b '0.0.0.0'
         volumes:
             - .:/usr/src/shutock
             - ./vender:/usr/local/vender
 
         ports:
-            - "3000:3000"
+            - "8080:8080"
         networks:
           - shutock_network
+
+    client:
+        build: ./client
+        command: yarn start
+        volumes:
+            - ./client:/usr/src/client
+        ports:
+            - "3000:3000"
+
 
 networks:
     shutock_network:
