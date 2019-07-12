@@ -1,26 +1,27 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter, Link, Route } from 'react-router-dom';
+import Header from './components/Header';
+import HomeScreen from './screens/HomeScreen';
+import ShopListScreen from './screens/ShopListScreen';
+import ShopRegisterScreen from './screens/ShopRegisterScreen';
+import ShopDetailScreen from './screens/ShopDetailScreen';
+import ProductRegisterScreen from './screens/ProductRegisterScreen';
+import ProductDetailScreen from './screens/ProductDetailScreen';
+import SearchResultScreen from './screens/SearchResultScreen';
 
 const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Header/>
+      <Route exact path='/' component={HomeScreen} />
+      <Route exact path='/shops' component={ShopListScreen} />
+      <Route exact path='/shops/new' component={ShopRegisterScreen} />
+      <Route exact path='/shops/:id' component={ShopDetailScreen} />
+      <Route exact path='/products/new' component={ProductRegisterScreen} />
+      <Route exact path='/products/:id' component={ProductDetailScreen} />
+      <Route exact path='/search?q=:keyword' component={SearchResultScreen} />
+    </BrowserRouter>
   );
-}
+};
 
 export default App;
