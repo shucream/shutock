@@ -1,21 +1,20 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from 'react'
+import styled from 'styled-components'
 
-interface Props {
+interface Props {}
 
+class ProductRegisterScreen extends React.Component<Props, {}> {
+  public render() {
+    return (
+      <Background>
+        <p>product new</p>
+      </Background>
+    )
+  }
 }
-
-const ProductRegisterScreen: React.FC<Props> = () => {
-  return (
-    <Background>
-      <p>product new</p>
-    </Background>
-  )
-};
-
 const Background = styled.div`
   width: 100%;
   height: 100px;
-`;
+`
 
-export default ProductRegisterScreen;
+export default ProductRegisterScreen
