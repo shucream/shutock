@@ -98,7 +98,7 @@ workflows:
   test:
     jobs:
       - test
-      - deploy-api:
+      - deploy-containers:
           requires:
             - test
       - deploy-client
