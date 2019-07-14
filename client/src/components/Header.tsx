@@ -39,7 +39,8 @@ class Header extends React.Component<Props, State> {
               paddingLeft: 10,
               marginLeft: 10,
               marginRight: 10,
-              display: 'flex'
+              display: 'flex',
+              flex: 1
             }}
           >
             <InputBase
@@ -134,6 +135,8 @@ const Title = styled(Link)`
 
 const RightContents = styled.div`
   display: flex;
+  flex: 1;
+  max-width: 400px;
 `
 
 export default withRouter(Header)
