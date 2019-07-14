@@ -52,6 +52,4 @@ workflows:
   test:
     jobs:
       - test
-  deploy:
-    jobs:
       - deploy-client
