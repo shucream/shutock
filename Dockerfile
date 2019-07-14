@@ -14,3 +14,6 @@ ADD ./Gemfile.lock $APP_ROOT/Gemfile.lock
 RUN gem install bundler -v 1.17.3
 RUN bundle _1.17.3_ install
 ADD . $APP_ROOT
+
+EXPOSE 3000
+ENTRYPOINT ["puma"]
