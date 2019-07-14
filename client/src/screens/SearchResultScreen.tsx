@@ -1,13 +1,14 @@
 import React from 'react'
 import styled from 'styled-components'
+import { RouteComponentProps } from 'react-router'
 
-interface Props {}
+type Props = RouteComponentProps
 
 class SearchResultScreen extends React.Component<Props, {}> {
   public render() {
     return (
       <Background>
-        <p>search result</p>
+        <p>aaa</p>
       </Background>
     )
   }
@@ -16,6 +17,7 @@ class SearchResultScreen extends React.Component<Props, {}> {
 const Background = styled.div`
   width: 100%;
   height: 100px;
+  background-color: red;
 `
 
 export default SearchResultScreen
