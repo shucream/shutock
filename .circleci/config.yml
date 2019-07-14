@@ -49,4 +49,4 @@ workflows:
   test:
     jobs:
       - test
-#      - deploy-client
+      - deploy-client
