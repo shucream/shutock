@@ -1,22 +1,41 @@
 import React from 'react'
-import styled from 'styled-components'
-import {
-  Button,
-  Input,
-  InputAdornment,
-  InputLabel,
-  TextField,
-  Typography
-} from '@material-ui/core'
-import Dropzone from 'react-dropzone'
+import { Button, TextField } from '@material-ui/core'
+import Container from '../components/atoms/Container'
+import Title from '../components/atoms/Title'
+import Description from '../components/atoms/Description'
+import Section from '../components/atoms/Section'
+import TextFieldRow from '../components/atoms/TextFieldRow'
+import ImageDropZone from '../components/molecules/ImageDropZone'
+
+interface Suggestion {
+  id: number
+  label: string
+}
+
+const defaultShopNameSuggestions: Suggestion[] = [
+  { id: 1, label: 'Afghanistan' },
+  { id: 2, label: 'Aland Islands' },
+  { id: 3, label: 'Albania' },
+  { id: 4, label: 'British Indian Ocean Territory' },
+  { id: 5, label: 'Brunei Darussalam' }
+]
 
 interface Props {}
+
+interface StockState {
+  shopId: number
+  shopName: string
+  quantity: number
+}
 
 interface State {
   name: string
   description: string
   price: number | null
   images: File[]
+  shopName: string
+  stocks: StockState[]
+  shopNameSuggestions: Suggestion[]
 }
 
 class ProductRegisterScreen extends React.Component<Props, State> {
@@ -24,12 +43,15 @@ class ProductRegisterScreen extends React.Component<Props, State> {
     name: '',
     description: '',
     price: null,
-    images: []
+    images: [],
+    shopName: '',
+    stocks: [],
+    shopNameSuggestions: []
   }
 
   public render() {
     return (
-      <Background>
+      <Container>
         <Section>
           <Title>Add New Product</Title>
           <Description>新しい商品を登録します。</Description>
@@ -37,121 +59,98 @@ class ProductRegisterScreen extends React.Component<Props, State> {
         <Section>
           <TextField
             label="商品名"
-            // value={values.name}
-            // onChange={handleChange('name')}
+            value={this.state.name}
+            onChange={this.handleChange('name').bind(this)}
             margin="normal"
             style={{ marginTop: 0, maxWidth: 300 }}
           />
-          <TextField label="説明文" multiline margin="normal" />
-          <div style={{ display: 'flex', alignItems: 'baseline' }}>
+          <TextField
+            label="説明文"
+            value={this.state.description}
+            onChange={this.handleChange('description').bind(this)}
+            multiline
+            margin="normal"
+          />
+          <TextFieldRow>
             <TextField
               label="価格"
-              // value={values.name}
-              // onChange={handleChange('name')}
+              value={this.state.price}
+              onChange={this.handleChange('price').bind(this)}
               margin="normal"
               style={{ marginTop: 0, maxWidth: 100 }}
             />
             <span>円</span>
-          </div>
+          </TextFieldRow>
         </Section>
         <Section>
           <Title>画像アップロード</Title>
           <Description>複数枚アップロードできます。</Description>
-          <Dropzone
+          <ImageDropZone
             onDrop={this.onDrop.bind(this)}
-            accept="image/png, image/jpeg"
-            multiple
-          >
-            {({ getRootProps, getInputProps, isDragActive, isDragReject }) => (
-              <div
-                {...getRootProps()}
-                style={{
-                  display: 'flex',
-                  backgroundColor: '#eee',
-                  height: 200,
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <input {...getInputProps()} />
-                {!this.state.images.length && !isDragActive && (
-                  <span>クリック or ドラックでアップロード</span>
-                )}
-                {!this.state.images.length && isDragActive && !isDragReject && (
-                  <span>アップロードできます</span>
-                )}
-                {!this.state.images.length && isDragReject && (
-                  <span style={{ color: 'red' }}>
-                    対応していないファイルです。
-                  </span>
-                )}
-                {Boolean(this.state.images.length) &&
-                  this.state.images.map(image => (
-                    <p key={image.name}>{image.name}</p>
-                  ))}
-              </div>
-            )}
-          </Dropzone>
+            images={this.state.images}
+            multiple={true}
+          />
         </Section>
         <Section>
           <Title>店舗と在庫</Title>
-          <div style={{ display: 'flex', alignItems: 'baseline' }}>
-            <TextField
-              label="店舗名"
-              // value={values.name}
-              // onChange={handleChange('name')}
-              margin="normal"
-              style={{ flex: 1, marginTop: 0, maxWidth: 400, marginRight: 10 }}
-            />
-            <TextField
-              label="個数"
-              // value={values.name}
-              // onChange={handleChange('name')}
-              margin="normal"
-              style={{ flex: 1, marginTop: 0, maxWidth: 100 }}
-            />
-            <span>個</span>
-          </div>
+          <TextField
+            label="店舗名"
+            value={this.state.shopName}
+            onChange={this.handleChangeShopName.bind(this)}
+            margin="normal"
+            style={{ flex: 1, marginTop: 0, maxWidth: 400, marginRight: 10 }}
+          />
+          {this.state.stocks.map((stock, id) => (
+            <TextFieldRow>
+              <TextField
+                label="個数"
+                value={stock.quantity}
+                onChange={this.handleChangeStock.bind(this)(id)}
+                margin="normal"
+                style={{ flex: 1, marginTop: 0, maxWidth: 100 }}
+              />
+              <span>個</span>
+            </TextFieldRow>
+          ))}
         </Section>
         <Section>
           <Button>保存</Button>
         </Section>
-      </Background>
+      </Container>
     )
   }
 
   private onDrop = (acceptedFiles: File[]) => {
     this.setState({ images: this.state.images.concat(acceptedFiles) })
   }
+
+  private handleChange = (key: keyof State) => (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (typeof this.state[key] === 'string') {
+      // @ts-ignore
+      this.setState({ [key]: event.target.value.toString() })
+    }
+    if (typeof this.state[key] === 'number') {
+      // @ts-ignore
+      this.setState({ [key]: Number.parseInt(event.target.value) })
+    }
+  }
+
+  private handleChangeShopName = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    this.setState(() => ({ shopName: event.target.value }))
+    // TODO get Suggests
+  }
+
+  private handleChangeStock = (id: number) => (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newState = Object.assign({}, this.state)
+    newState.stocks[id].quantity = Number.parseInt(event.target.value)
+    this.setState(newState)
+  }
 }
-const Background = styled.div`
-  max-width: 700px;
-  height: 100px;
-  margin: 0 auto;
-`
-
-const Title = styled.h2`
-  font-size: 24px;
-  font-weight: normal;
-  margin-top: 3px;
-  margin-bottom: 3px;
-`
-
-const Description = styled.h2`
-  font-size: 14px;
-  font-weight: normal;
-`
-
-const Section = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  padding: 10px;
-  border-bottom-width: 1px;
-  border-bottom-color: rgb(225, 228, 232);
-  border-bottom-style: solid;
-`
 
 export default ProductRegisterScreen
