@@ -37,7 +37,7 @@ jobs:
     docker:
       - image: innovatorjapan/awscli:latest
     environment:
-      - AWS_S3_BUCKET_NAME: arn:aws:s3:::shutock-react-bucket
+      - AWS_S3_BUCKET_NAME: shutock-react-bucket
     steps:
       - checkout
       - run:
