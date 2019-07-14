@@ -41,12 +41,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: install yarn
-          command: npm install yarn
-      - run:
-          name: Build
-          command: yarn build
-      - run:
           name: Deploy to S3 if branch is Master.
           command: aws s3 sync ~/shutock/client/build/ s3://${AWS_S3_BUCKET_NAME}/ --exact-timestamps --delete
 
