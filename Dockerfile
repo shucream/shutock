@@ -16,4 +16,4 @@ RUN bundle _1.17.3_ install
 ADD . $APP_ROOT
 
 EXPOSE 3000
-ENTRYPOINT ["puma"]
+CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
