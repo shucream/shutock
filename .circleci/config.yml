@@ -61,14 +61,10 @@ jobs:
               -t $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/shutock-rails-repo:latest \
               -t $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/shutock-rails-repo:$CIRCLE_SHA1 .
             docker push \
-              $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/shutock-rails-repo:latest
-            docker push \
               $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/shutock-rails-repo:$CIRCLE_SHA1
             docker build \
               -t $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/shutock-nginx-repo:latest \
               -t $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/shutock-nginx-repo:$CIRCLE_SHA1 nginx
-            docker push \
-              $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/shutock-nginx-repo:latest
             docker push \
               $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/shutock-nginx-repo:$CIRCLE_SHA1
 

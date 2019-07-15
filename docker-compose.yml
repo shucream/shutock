@@ -12,7 +12,7 @@ services:
 
     api:
         build: .
-        command: bundle exec rails s -p 3000 -b '0.0.0.0'
+        command: /bin/sh -c "rm -f /myapp/tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
         volumes:
             - .:/usr/src/shutock
             - ./vender:/usr/local/vender
@@ -21,6 +21,13 @@ services:
             - "3000:3000"
         networks:
           - shutock_network
+
+    nginx:
+        build: nginx/
+        ports:
+            - "8080:80"
+        networks:
+            - shutock_network
 
 networks:
     shutock_network:
