@@ -39,7 +39,7 @@ test:
 #
 production:
   <<: *default
-  host: <%= Rails.application.credentials.rds[:host] %>
-  database: <%= Rails.application.credentials.rds[:database] %>
-  username: <%= Rails.application.credentials.rds[:username] %>
-  password: <%= Rails.application.credentials.rds[:password] %>
+  host: <%= ENV['RDS_HOST'] %>
+  database: <%= ENV['RDS_NAME'] %>
+  username: <%= ENV['RDS_USER'] %>
+  password: <%= ENV['RDS_PASS'] %>
