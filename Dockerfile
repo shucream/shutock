@@ -16,5 +16,5 @@ RUN gem install bundler -v 1.17.3
 RUN bundle _1.17.3_ install
 ADD . $APP_ROOT
 
-#EXPOSE 3000
-#CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
+EXPOSE 3000
+CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
