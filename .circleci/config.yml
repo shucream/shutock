@@ -122,7 +122,7 @@ jobs:
           name: Push release docker-image
           command: |
             $(aws ecr get-login --no-include-email --region ap-northeast-1)
-            docker build -t $NGINX_CONTAINER_IMAGE:release-$CIRCLE_SHA1 .
+            docker build -t $NGINX_CONTAINER_IMAGE:release-$CIRCLE_SHA1 nginx
             docker push $NGINX_CONTAINER_IMAGE:release-$CIRCLE_SHA1
 
   nginx-deployment:
