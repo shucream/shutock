@@ -1,6 +1,28 @@
-version: 2
+version: 2.1
+orbs:
+  aws-s3: circleci/aws-s3@1.0.0
+  aws-ecr: circleci/aws-ecr@6.1.0
 jobs:
-  test:
+  api-build:
+    docker:
+      - image: circleci/python:3.7.1
+    working_directory: ~/shutock
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install awscli
+          command: |
+            sudo pip install awscli
+            aws --version
+      - run:
+          name: Push release docker-image
+          command: |
+            $(aws ecr get-login --no-include-email --region ap-northeast-1)
+            docker build -t $RAILS_CONTAINER_IMAGE:test-$CIRCLE_SHA1 .
+            docker push $RAILS_CONTAINER_IMAGE:test-$CIRCLE_SHA1
+
+  api-test:
     working_directory: ~/shutock
     docker:
       - image: circleci/ruby:2.5.3-node
@@ -25,89 +47,175 @@ jobs:
           key: shutock-{{ checksum "Gemfile.lock" }}
           paths:
             - vendor/bundle
-
       # DBの起動待ち
       - run: dockerize -wait tcp://localhost:3306 -timeout 1m
-
       - run: bundle exec rails db:create db:migrate
       - run: bundle exec rspec -f d
 
-  deploy-containers:
+  api-release-image:
     docker:
-      - image: circleci/python
+      - image: circleci/python:3.7.1
+    working_directory: ~/shutock
     steps:
       - checkout
       - setup_remote_docker
       - run:
-          name: install aws
+          name: Install awscli
           command: |
             sudo pip install awscli
             aws --version
       - run:
-          name: Install ecs-deploy
+          name: Push release docker-image
           command: |
-            curl https://raw.githubusercontent.com/silinternational/ecs-deploy/master/ecs-deploy | sudo tee -a /usr/bin/ecs-deploy
-            sudo chmod +x /usr/bin/ecs-deploy
+            $(aws ecr get-login --no-include-email --region ap-northeast-1)
+            docker pull $RAILS_CONTAINER_IMAGE:test-$CIRCLE_SHA1
+            docker tag $RAILS_CONTAINER_IMAGE:test-$CIRCLE_SHA1 $RAILS_CONTAINER_IMAGE:release-$CIRCLE_SHA1
+            docker push $RAILS_CONTAINER_IMAGE:release-$CIRCLE_SHA1
+
+  api-deployment:
+    docker:
+      - image: circleci/python:3.7.1
+    working_directory: ~/shutock
+    environment:
+      - CONFIG_NAME: shutock-rails
+    steps:
+      - checkout
       - run:
-          name: Install jq
-          command: sudo apt-get install -y jq
-      - run:
-          name: "Log in to AWS ECR"
-          command: eval $(aws ecr get-login --no-include-email --region ap-northeast-1)
-      - run:
-          name: "Build & Push Docker Image"
+          name: Setup AWS ecs-cli
           command: |
-            docker build \
-              -t $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/shutock-rails-repo:latest \
-              -t $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/shutock-rails-repo:$CIRCLE_SHA1 .
-            docker push \
-              $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/shutock-rails-repo:$CIRCLE_SHA1
-            docker build \
-              -t $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/shutock-nginx-repo:latest \
-              -t $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/shutock-nginx-repo:$CIRCLE_SHA1 nginx
-            docker push \
-              $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/shutock-nginx-repo:$CIRCLE_SHA1
-
-#      - run:
-#          name: "DB Migrate"
-#          command: |
-#            aws ecs run-task \
-#              --region ap-northeast-1 \
-#              --cluster shutock-cluster \
-#              --task-definition shutock-rails-task \
-#              --overrides file://ecs/run_task_db_migrate.json
-
+            sudo curl -o /usr/local/bin/ecs-cli https://s3.amazonaws.com/amazon-ecs-cli/ecs-cli-linux-amd64-latest
+            sudo chmod +x /usr/local/bin/ecs-cli
+            ecs-cli --version
+            ecs-cli configure --cluster ci-cd-rails --default-launch-type EC2 --region ap-northeast-1 --config-name ${CONFIG_NAME}
       - run:
-          name: "Sevice deploy"
-          environment:
+          name: Rolling update
           command: |
-            ecs-deploy --cluster shutock-app-cluster --service_name shutock-app-service \
-              --region ap-northeast-1 --timeout 240 \
-              --image $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/shutock-rails-repo:$CIRCLE_SHA1
-            ecs-deploy --cluster shutock-app-cluster --service_name shutock-app-service \
-              --region ap-northeast-1 --timeout 240 \
-              --image $AWS_ACCOUNT_ID.dkr.ecr.ap-northeast-1.amazonaws.com/shutock-nginx-repo:$CIRCLE_SHA1
+            ecs-cli compose \
+              --file .circleci/deployment/app-service.yml \
+              --ecs-params .circleci/deployment/ecs-params.yml \
+              --project-name ci-cd-rails-app-service \
+              --cluster-config ${CONFIG_NAME} \
+              service up
+      - run:
+          name: DB migration
+          command: |
+            ecs-cli compose \
+              --file .circleci/deployment/db-migration.yml \
+              --ecs-params .circleci/deployment/ecs-params.yml \
+              --project-name ci-cd-rails-db-migration \
+              --cluster-config ${CONFIG_NAME} \
+              service up
 
-  deploy-client:
+  nginx-build:
+    docker:
+      - image: circleci/python:3.7.1
+      working_directory: ~/shutock/nginx
+      steps:
+        - checkout
+        - setup_remote_docker
+        - run:
+            name: Install awscli
+            command: |
+              sudo pip install awscli
+              aws --version
+        - run:
+            name: Push release docker-image
+            command: |
+              $(aws ecr get-login --no-include-email --region ap-northeast-1)
+              docker build -t $NGINX_CONTAINER_IMAGE:release-$CIRCLE_SHA1 .
+              docker push $NGINX_CONTAINER_IMAGE:release-$CIRCLE_SHA1
+
+  nginx-deployment:
+    docker:
+      - image: circleci/python:3.7.1
+    working_directory: ~/shutock/nginx
+    environment:
+      - CONFIG_NAME: shutock-nginx
+    steps:
+      - checkout
+      - run:
+          name: Setup AWS ecs-cli
+          command: |
+            sudo curl -o /usr/local/bin/ecs-cli https://s3.amazonaws.com/amazon-ecs-cli/ecs-cli-linux-amd64-latest
+            sudo chmod +x /usr/local/bin/ecs-cli
+            ecs-cli --version
+            ecs-cli configure --cluster ci-cd-rails --default-launch-type EC2 --region ap-northeast-1 --config-name ${CONFIG_NAME}
+      - run:
+          name: Rolling update
+          command: |
+            ecs-cli compose \
+              --file .circleci/deployment/app-service.yml \
+              --ecs-params .circleci/deployment/ecs-params.yml \
+              --project-name ci-cd-rails-app-service \
+              --cluster-config ${CONFIG_NAME} \
+              service up
+
+
+  client-build-deployment:
     working_directory: ~/shutock
     docker:
-      - image: innovatorjapan/awscli:latest
+      - image: circleci/node:8.9.4
     environment:
       - AWS_S3_BUCKET_NAME: shutock-react-bucket
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-packages-{{ checksum "yarn.lock" }}
       - run:
-          name: Deploy to S3 if branch is Master.
-          command: aws s3 sync ~/shutock/client/build/ s3://${AWS_S3_BUCKET_NAME}/ --exact-timestamps --delete
-
-
+          name: Install Dependencies
+          command: yarn install --frozen-lockfile
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
+      - run:
+          name: Build
+          command: yarn build
+      - aws-s3/sync:
+          from: ~/shutock/client/build/
+          to: s3://${AWS_S3_BUCKET_NAME}/
+          arguments: --exact-timestamps --delete
+          overwrite: true
+#      - run:
+#          name: Deploy to S3
+#          command: aws s3 sync ~/shutock/client/build/ s3://${AWS_S3_BUCKET_NAME}/ --exact-timestamps --delete
 
 workflows:
   version: 2
-  test:
+  api:
     jobs:
-      - test
-      - deploy-containers:
+      - api-build
+      - api-test:
+          requires:
+            - build
+      - api-release-image:
           requires:
             - test
-      - deploy-client
+#          filters:
+#            branches:
+#              only: production
+      - api-deployment:
+          requires:
+            - release-image
+#          filters:
+#            branches:
+#              only: production
+  nginx:
+    jobs:
+      - nginx-build
+      - nginx-release-image:
+          requires:
+            - nginx-build
+#          filters:
+#            branches:
+#              only: production
+      - nginx-deployment:
+          requires:
+            - release-nginx-image:
+
+  client:
+    jobs:
+      - client-build-deployment

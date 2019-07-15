@@ -1,0 +1,16 @@
+version: 1
+task_definition:
+  task_role_arn: $TASK_ROLE_ARN
+  services:
+    shutock-nginx:
+      cpu_shares: 250
+      mem_limit: 524288000 # 500MB
+      mem_reservation: 262144000 # 250MB
+    shutock-rails:
+      cpu_shares: 250
+      mem_limit: 524288000 # 500MB
+      mem_reservation: 262144000 # 250MB
+    shutock-rails-db-migration:
+      cpu_shares: 250
+      mem_limit: 524288000 # 500MB
+      mem_reservation: 262144000 # 250MB
