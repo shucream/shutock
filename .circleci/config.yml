@@ -151,31 +151,32 @@ jobs:
 #              service up
 
   client-build-deployment:
-    working_directory: ~/shutock/client
+    working_directory: ~/shutock/
     docker:
       - image: circleci/node:8.9.4
     environment:
       - AWS_S3_BUCKET_NAME: shutock-react-bucket
     steps:
       - checkout
-      - run:
-          name: ls
-          command: ls -a
       - restore_cache:
           name: Restore Yarn Package Cache
           keys:
             - yarn-packages-{{ checksum "yarn.lock" }}
+          working_directory: client/
       - run:
           name: Install Dependencies
           command: yarn install --frozen-lockfile
+          working_directory: client/
       - save_cache:
           name: Save Yarn Package Cache
           key: yarn-packages-{{ checksum "yarn.lock" }}
+          working_directory: client/
           paths:
             - ~/shucream/.cache/yarn
       - run:
           name: Build
           command: yarn build
+          working_directory: client/
       - aws-s3/sync:
           from: ~/shutock/client/build/
           to: s3://${AWS_S3_BUCKET_NAME}/
