@@ -18,6 +18,16 @@ services:
             - ./vender:/usr/local/vender
 
         ports:
+            - "8080:3000"
+        networks:
+          - shutock_network
+
+    client:
+        build: ./client
+        command: yarn start
+        volumes:
+            - ./client:/usr/src/client
+        ports:
             - "3000:3000"
         networks:
           - shutock_network
