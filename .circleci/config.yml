@@ -5,20 +5,6 @@ orbs:
   aws-ecr: circleci/aws-ecr@6.1.0
   aws-ecs: circleci/aws-ecs@0.0.8
 jobs:
-#      - checkout
-#      - setup_remote_docker
-#      - run:
-#          name: Install awscli
-#          command: |
-#            sudo pip install awscli
-#            aws --version
-#      - run:
-#          name: Push release docker-image
-#          command: |
-#            $(aws ecr get-login --no-include-email --region ap-northeast-1)
-#            docker build -t $RAILS_CONTAINER_IMAGE:test-$CIRCLE_SHA1 .
-#            docker push $RAILS_CONTAINER_IMAGE:test-$CIRCLE_SHA1
-
   api-test:
     working_directory: ~/shutock
     docker:
@@ -49,103 +35,7 @@ jobs:
       - run: bundle exec rails db:create db:migrate
       - run: bundle exec rspec -f d
 
-#  api-release-image:
-#    docker:
-#      - image: circleci/python:3.7.1
-#    working_directory: ~/shutock
-#    steps:
-#      - checkout
-#      - setup_remote_docker
-#      - run:
-#          name: Install awscli
-#          command: |
-#            sudo pip install awscli
-#            aws --version
-#      - run:
-#          name: Push release docker-image
-#          command: |
-#            $(aws ecr get-login --no-include-email --region ap-northeast-1)
-#            docker pull $RAILS_CONTAINER_IMAGE:test-$CIRCLE_SHA1
-#            docker tag $RAILS_CONTAINER_IMAGE:test-$CIRCLE_SHA1 $RAILS_CONTAINER_IMAGE:release-$CIRCLE_SHA1
-#            docker push $RAILS_CONTAINER_IMAGE:release-$CIRCLE_SHA1
 
-#  api-deployment:
-#    docker:
-#      - image: circleci/python:3.7.1
-#    working_directory: ~/shutock
-#    environment:
-#      - CONFIG_NAME: shutock-rails
-#    steps:
-#      - checkout
-#      - run:
-#          name: Setup AWS ecs-cli
-#          command: |
-#            sudo curl -o /usr/local/bin/ecs-cli https://s3.amazonaws.com/amazon-ecs-cli/ecs-cli-linux-amd64-latest
-#            sudo chmod +x /usr/local/bin/ecs-cli
-#            ecs-cli --version
-#            ecs-cli configure --cluster ci-cd-rails --default-launch-type EC2 --region ap-northeast-1 --config-name ${CONFIG_NAME}
-#      - run:
-#          name: Rolling update
-#          command: |
-#            ecs-cli compose \
-#              --file .circleci/deployment/app-service.yml \
-#              --ecs-params .circleci/deployment/ecs-params.yml \
-#              --project-name ci-cd-rails-app-service \
-#              --cluster-config ${CONFIG_NAME} \
-#              service up
-#      - run:
-#          name: DB migration
-#          command: |
-#            ecs-cli compose \
-#              --file .circleci/deployment/db-migration.yml \
-#              --ecs-params .circleci/deployment/ecs-params.yml \
-#              --project-name ci-cd-rails-db-migration \
-#              --cluster-config ${CONFIG_NAME} \
-#              service up
-
-#  nginx-build:
-#    docker:
-#      - image: circleci/python:3.7.1
-#    working_directory: ~/shutock/nginx
-#    steps:
-#      - checkout
-#      - setup_remote_docker
-#      - run:
-#          name: Install awscli
-#          command: |
-#            sudo pip install awscli
-#            aws --version
-#      - run:
-#          name: Push release docker-image
-#          command: |
-#            $(aws ecr get-login --no-include-email --region ap-northeast-1)
-#            docker build -t $NGINX_CONTAINER_IMAGE:release-$CIRCLE_SHA1 nginx
-#            docker push $NGINX_CONTAINER_IMAGE:release-$CIRCLE_SHA1
-#
-#  nginx-deployment:
-#    docker:
-#      - image: circleci/python:3.7.1
-#    working_directory: ~/shutock/nginx
-#    environment:
-#      - CONFIG_NAME: shutock-nginx
-#    steps:
-#      - checkout
-#      - run:
-#          name: Setup AWS ecs-cli
-#          command: |
-#            sudo curl -o /usr/local/bin/ecs-cli https://s3.amazonaws.com/amazon-ecs-cli/ecs-cli-linux-amd64-latest
-#            sudo chmod +x /usr/local/bin/ecs-cli
-#            ecs-cli --version
-#            ecs-cli configure --cluster ci-cd-rails --default-launch-type EC2 --region ap-northeast-1 --config-name ${CONFIG_NAME}
-#      - run:
-#          name: Rolling update
-#          command: |
-#            ecs-cli compose \
-#              --file .circleci/deployment/app-service.yml \
-#              --ecs-params .circleci/deployment/ecs-params.yml \
-#              --project-name ci-cd-rails-app-service \
-#              --cluster-config ${CONFIG_NAME} \
-#              service up
 
   client-build-deployment:
     working_directory: ~/shutock/
