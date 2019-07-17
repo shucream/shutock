@@ -203,8 +203,11 @@ workflows:
 #          filters:
 #            branches:
 #              only: production
-#  nginx:
-#    jobs:
+  nginx:
+    jobs:
+      - aws-ecr/build-and-push-image:
+          repo: shutock-nginx-repo
+          path: nginx/
 #      - nginx-build
 #      - nginx-deployment:
 #          requires:
