@@ -219,12 +219,13 @@ workflows:
           tag: 'latest'
           dockerfile: nginx/Dockerfile
           path: nginx/
-#      - aws-ecs/deploy-service-update:
-#          requires:
-#            - build-push
-#          family: '${MY_APP_PREFIX}-service'
-#          cluster-name: '${MY_APP_PREFIX}-cluster'
-#          container-image-name-updates: 'container=${MY_APP_PREFIX}-service,tag=${CIRCLE_SHA1}'
+      - aws-ecs/deploy-service-update:
+          requires:
+            - build-push
+          family: 'shutock-ec2-task'
+          cluster-name: 'shutock-app-cluster'
+          service-name: 'shutock-app-ec2'
+          container-image-name-updates: 'container=nginx,tag=${CIRCLE_SHA1}'
 #      - nginx-build
 #      - nginx-deployment:
 #          requires:
