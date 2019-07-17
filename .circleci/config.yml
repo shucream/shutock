@@ -151,7 +151,7 @@ jobs:
 #              service up
 
   client-build-deployment:
-    working_directory: ~/shutock
+    working_directory: ~/shutock/client
     docker:
       - image: circleci/node:8.9.4
     environment:
@@ -169,7 +169,7 @@ jobs:
           name: Save Yarn Package Cache
           key: yarn-packages-{{ checksum "yarn.lock" }}
           paths:
-            - ~/.cache/yarn
+            - .cache/yarn
       - run:
           name: Build
           command: yarn build
