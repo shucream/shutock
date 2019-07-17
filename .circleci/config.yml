@@ -4,13 +4,6 @@ orbs:
   aws-s3: circleci/aws-s3@1.0.11
   aws-ecr: circleci/aws-ecr@6.1.0
 jobs:
-  api-build:
-    docker:
-      - image: circleci/python:3.7.1
-    working_directory: ~/shutock
-    steps:
-      - aws-ecr/build-and-push-image:
-          repo: shutock-rails-repo
 
 
 #      - checkout
@@ -193,7 +186,9 @@ workflows:
 
   api:
     jobs:
-      - api-build
+      - aws-ecr/build-and-push-image:
+          repo: shutock-rails-repo
+
 #      - api-test:
 #          requires:
 #            - api-build
