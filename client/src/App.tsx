@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter, Link, Route } from 'react-router-dom'
+import { BrowserRouter, Route } from 'react-router-dom'
 import Header from './components/Header'
 import HomeScreen from './screens/HomeScreen'
 import ShopListScreen from './screens/ShopListScreen'
