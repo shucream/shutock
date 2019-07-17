@@ -1,0 +1,21 @@
+version: "3"
+services:
+  shutock-rails:
+    image: $RAILS_CONTAINER_IMAGE:release-$CIRCLE_SHA1
+    command: [ "bundle", "exec", "rails", "s", "-p", "3000", "-b", "0.0.0.0" ]
+    ports:
+      - "3000"
+    environment:
+      RAILS_ENV: production
+      RAILS_SERVE_STATIC_FILES: true
+      RAILS_LOG_TO_STDOUT: true
+#    logging:
+#      driver: awslogs
+#      options:
+#        awslogs-group: ci-cd-rails-app # TODO
+#        awslogs-region: ap-northeast-1
+#        awslogs-stream-prefix: services
+  shutock-nginx:
+    image: $NGINX_CONTAINER_IMAGE:release-$CIRCLE_SHA1
+    ports:
+      - "80"

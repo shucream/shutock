@@ -1,0 +1,14 @@
+version: "3"
+services:
+  shutock-rails-db-migration:
+    image: $CONTAINER_IMAGE:release-$CIRCLE_SHA1
+    command: ["bundle", "exec", "rails", "db:migrate"]
+    environment:
+      RAILS_ENV: "production"
+      RAILS_LOG_TO_STDOUT: "true"
+#    logging:
+#      driver: awslogs
+#      options:
+#        awslogs-group: ci-cd-rails-db-migration #TODO
+#        awslogs-region: ap-northeast-1
+#        awslogs-stream-prefix: services

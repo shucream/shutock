@@ -1,9 +1,7 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from 'react'
+import styled from 'styled-components'
 
-interface Props {
-
-}
+interface Props {}
 
 const ProductRegisterScreen: React.FC<Props> = () => {
   return (
@@ -11,11 +9,11 @@ const ProductRegisterScreen: React.FC<Props> = () => {
       <p>product new</p>
     </Background>
   )
-};
+}
 
 const Background = styled.div`
   width: 100%;
   height: 100px;
-`;
+`
 
-export default ProductRegisterScreen;
+export default ProductRegisterScreen

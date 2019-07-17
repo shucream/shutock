@@ -1,10 +1,8 @@
-import React from 'react';
-import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import React from 'react'
+import styled from 'styled-components'
+import { Link } from 'react-router-dom'
 
-interface Props {
-
-}
+interface Props {}
 
 const Header: React.FC<Props> = () => {
   return (
@@ -16,12 +14,12 @@ const Header: React.FC<Props> = () => {
       <Link to={'/'}>home</Link>
     </Background>
   )
-};
+}
 
 const Background = styled.div`
   width: 100%;
   height: 100px;
   background-color: #ddd;
-`;
+`
 
 export default Header
