@@ -10,6 +10,7 @@ jobs:
     working_directory: ~/shutock
     steps:
       - aws-ecr/build-and-push-image:
+          repo: shutock-rails-repo
 
 
 #      - checkout
