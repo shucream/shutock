@@ -158,6 +158,9 @@ jobs:
       - AWS_S3_BUCKET_NAME: shutock-react-bucket
     steps:
       - checkout
+      - run:
+          name: ls
+          command: ls -a
       - restore_cache:
           name: Restore Yarn Package Cache
           keys:
