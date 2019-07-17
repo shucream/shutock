@@ -216,7 +216,7 @@ workflows:
       - aws-ecr/build-and-push-image:
           name: build-push
           repo: shutock-nginx-repo
-          tag: 'latest'
+          tag: '${CIRCLE_SHA1}'
           dockerfile: nginx/Dockerfile
           path: nginx/
       - aws-ecs/deploy-service-update:
