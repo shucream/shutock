@@ -186,12 +186,11 @@ workflows:
 
   api:
     jobs:
+      - api-test
       - aws-ecr/build-and-push-image:
           repo: shutock-rails-repo
-
-#      - api-test:
-#          requires:
-#            - api-build
+          requires:
+            - api-test
 #      - api-release-image:
 #          requires:
 #            - api-test
