@@ -153,7 +153,7 @@ jobs:
   client-build-deployment:
     working_directory: ~/shutock/
     docker:
-      - image: circleci/node:8.9.4
+      - image: circleci/node:11.12
     environment:
       - AWS_S3_BUCKET_NAME: shutock-react-bucket
     steps:
