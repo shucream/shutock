@@ -153,7 +153,7 @@ jobs:
   client-build-deployment:
     working_directory: ~/shutock/
     docker:
-      - image: circleci/node:11.12
+      - image: jiripuc/circleci-python-node:stretch-python-3.6.8-node-10.14.2
     environment:
       - AWS_S3_BUCKET_NAME: shutock-react-bucket
     steps:
@@ -161,7 +161,7 @@ jobs:
       - restore_cache:
           name: Restore Yarn Package Cache
           keys:
-            - yarn-packages-{{ checksum "yarn.lock" }}
+            - yarn-packages-{{ checksum "client/yarn.lock" }}
           working_directory: client/
       - run:
           name: Install Dependencies
@@ -169,7 +169,7 @@ jobs:
           working_directory: client/
       - save_cache:
           name: Save Yarn Package Cache
-          key: yarn-packages-{{ checksum "yarn.lock" }}
+          key: yarn-packages-{{ checksum "client/yarn.lock" }}
           working_directory: client/
           paths:
             - ~/shucream/.cache/yarn
