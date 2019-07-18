@@ -84,4 +84,4 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 end
 
-Rails.application.routes.default_url_options = { host: 'http://3.112.204.124/api'}
+Rails.application.routes.default_url_options = { host: '3.112.204.124'} # TODO 環境変数から取ってくる
