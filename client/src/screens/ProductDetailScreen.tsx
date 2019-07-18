@@ -52,8 +52,8 @@ class ProductDetailScreen extends React.Component<Props, State> {
       `/v1/products/${this.props.match.params.id}`
     ).then(response => {
       if (response.success) {
-        this.setState({ product: response.data })
         console.log(response)
+        this.setState({ product: response.data })
       }
     })
   }
@@ -112,12 +112,15 @@ class ProductDetailScreen extends React.Component<Props, State> {
           </Section>
           <Section>
             <Title>取扱店舗</Title>
-            {this.state.product.stocks}
-            <ShopList
-              shops={
-                this.state.product.stocks.map(stock => stock.shop) as ShopDto[]
-              }
-            />
+            {this.state.product.stocks && (
+              <ShopList
+                shops={
+                  this.state.product.stocks.map(
+                    stock => stock.shop
+                  ) as ShopDto[]
+                }
+              />
+            )}
           </Section>
         </Background>
       )

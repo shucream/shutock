@@ -24,9 +24,10 @@ services:
     nginx:
         build: nginx/
         ports:
-            - "8080:80"
+            - "80:80"
         environment:
-            - CLIENT_HOST=localhost:3001
+            - CLIENT_HOST=192.168.179.7:3001
+
         networks:
           - shutock_network
 

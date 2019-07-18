@@ -92,10 +92,11 @@ export default class ApiClient {
    * @param path
    */
   protected static getUrl(path: string) {
-    const host =
-      process.env.REACT_APP_ENVIRONMENT === 'development'
-        ? 'localhost:3000/api'
-        : '3.112.204.124/api'
+    const host = 'localhost:80/api'
+    // process.env.REACT_APP_ENVIRONMENT === 'development'
+    //   ? 'localhost:80/api'
+    //   : 'http://3.112.204.124/api'
+
     return `http://${host}${path}`
   }
 }
