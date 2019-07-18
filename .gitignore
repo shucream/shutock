@@ -24,3 +24,5 @@
 
 # RubyMine
 .idea
+
+node_modules

@@ -1,6 +1,11 @@
-version: 2
+version: 2.1
+
+orbs:
+  aws-s3: circleci/aws-s3@1.0.11
+  aws-ecr: circleci/aws-ecr@6.1.0
+  aws-ecs: circleci/aws-ecs@0.0.8
 jobs:
-  test:
+  api-test:
     working_directory: ~/shutock
     docker:
       - image: circleci/ruby:2.5.3-node
@@ -25,15 +30,100 @@ jobs:
           key: shutock-{{ checksum "Gemfile.lock" }}
           paths:
             - vendor/bundle
-
       # DBの起動待ち
       - run: dockerize -wait tcp://localhost:3306 -timeout 1m
-
       - run: bundle exec rails db:create db:migrate
       - run: bundle exec rspec -f d
 
+
+
+  client-build-deployment:
+    working_directory: ~/shutock/
+    docker:
+      - image: jiripuc/circleci-python-node:stretch-python-3.6.8-node-10.14.2
+    environment:
+      - AWS_S3_BUCKET_NAME: shutock-react-bucket
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-packages-{{ checksum "client/yarn.lock" }}
+          working_directory: client/
+      - run:
+          name: Install Dependencies
+          command: yarn install --frozen-lockfile
+          working_directory: client/
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ checksum "client/yarn.lock" }}
+          working_directory: client/
+          paths:
+            - ~/shucream/.cache/yarn
+      - run:
+          name: Build
+          command: yarn build
+          working_directory: client/
+      - aws-s3/sync:
+          from: ~/shutock/client/build/
+          to: s3://${AWS_S3_BUCKET_NAME}/
+          overwrite: true
+
+
 workflows:
-  version: 2
-  test:
+  version: 2.1
+
+  api:
     jobs:
-      - test
+      - api-test
+      - aws-ecr/build-and-push-image:
+          name: build-push
+          repo: shutock-rails-repo
+          tag: '${CIRCLE_SHA1}'
+          requires:
+            - api-test
+      - aws-ecs/deploy-service-update:
+          requires:
+            - build-push
+          family: 'shutock-ec2-task'
+          cluster-name: 'shutock-app-cluster'
+          service-name: 'shutock-app-ec2'
+          container-image-name-updates: 'container=rails,tag=${CIRCLE_SHA1}'
+#      - api-release-image:
+#          requires:
+#            - api-test
+#          filters:
+#            branches:
+#              only: production
+#      - api-deployment:
+#          requires:
+#            - api-release-image
+#          filters:
+#            branches:
+#              only: production
+  nginx:
+    jobs:
+      - aws-ecr/build-and-push-image:
+          name: build-push
+          repo: shutock-nginx-repo
+          tag: '${CIRCLE_SHA1}'
+          dockerfile: nginx/Dockerfile
+          path: nginx/
+      - aws-ecs/deploy-service-update:
+          requires:
+            - build-push
+          family: 'shutock-ec2-task'
+          cluster-name: 'shutock-app-cluster'
+          service-name: 'shutock-app-ec2'
+          container-image-name-updates: 'container=nginx,tag=${CIRCLE_SHA1}'
+#      - nginx-build
+#      - nginx-deployment:
+#          requires:
+#            - nginx-build
+#          filters:
+#            branches:
+#              only: production
+
+  client:
+    jobs:
+      - client-build-deployment
