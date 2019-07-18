@@ -9,6 +9,7 @@ import ProductRegisterScreen from './screens/ProductRegisterScreen'
 import ProductDetailScreen from './screens/ProductDetailScreen'
 import SearchResultScreen from './screens/SearchResultScreen'
 import NotFoundScreen from './screens/NotFoundScreen'
+import StockRegisterScreen from './screens/StockRegisterScreen'
 
 const App: React.FC = () => {
   return (
@@ -21,7 +22,10 @@ const App: React.FC = () => {
         <Route exact path="/shops/new" component={ShopRegisterScreen} />
         <Route exact path="/shops/:id" component={ShopDetailScreen} />
         <Route exact path="/products/new" component={ProductRegisterScreen} />
-        <Route path="/products/:id" component={ProductDetailScreen} />
+        <Route exact path="/products/:id" component={ProductDetailScreen} />
+        {/*<Route exact path="/products/:id/edit" component={ProductEditScreen} />*/}
+        {/*<Route exact path="/products/:id/delete" component={ProductDeleteCheckScreen} />*/}
+        <Route exact path="/stocks/new" component={StockRegisterScreen} />
         <Route component={NotFoundScreen} />
       </Switch>
     </BrowserRouter>

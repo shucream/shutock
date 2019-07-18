@@ -7,35 +7,13 @@ import Section from '../components/atoms/Section'
 import TextFieldRow from '../components/atoms/TextFieldRow'
 import ImageDropZone from '../components/molecules/ImageDropZone'
 
-interface Suggestion {
-  id: number
-  label: string
-}
-
-const defaultShopNameSuggestions: Suggestion[] = [
-  { id: 1, label: 'Afghanistan' },
-  { id: 2, label: 'Aland Islands' },
-  { id: 3, label: 'Albania' },
-  { id: 4, label: 'British Indian Ocean Territory' },
-  { id: 5, label: 'Brunei Darussalam' }
-]
-
 interface Props {}
-
-interface StockState {
-  shopId: number
-  shopName: string
-  quantity: number
-}
 
 interface State {
   name: string
   description: string
   price: number | null
   images: File[]
-  shopName: string
-  stocks: StockState[]
-  shopNameSuggestions: Suggestion[]
 }
 
 class ProductRegisterScreen extends React.Component<Props, State> {
@@ -43,10 +21,7 @@ class ProductRegisterScreen extends React.Component<Props, State> {
     name: '',
     description: '',
     price: null,
-    images: [],
-    shopName: '',
-    stocks: [],
-    shopNameSuggestions: []
+    images: []
   }
 
   public render() {
@@ -92,29 +67,7 @@ class ProductRegisterScreen extends React.Component<Props, State> {
           />
         </Section>
         <Section>
-          <Title>店舗と在庫</Title>
-          <TextField
-            label="店舗名"
-            value={this.state.shopName}
-            onChange={this.handleChangeShopName.bind(this)}
-            margin="normal"
-            style={{ flex: 1, marginTop: 0, maxWidth: 400, marginRight: 10 }}
-          />
-          {this.state.stocks.map((stock, id) => (
-            <TextFieldRow>
-              <TextField
-                label="個数"
-                value={stock.quantity}
-                onChange={this.handleChangeStock.bind(this)(id)}
-                margin="normal"
-                style={{ flex: 1, marginTop: 0, maxWidth: 100 }}
-              />
-              <span>個</span>
-            </TextFieldRow>
-          ))}
-        </Section>
-        <Section>
-          <Button>保存</Button>
+          <Button variant="outlined">保存</Button>
         </Section>
       </Container>
     )
@@ -135,21 +88,6 @@ class ProductRegisterScreen extends React.Component<Props, State> {
       // @ts-ignore
       this.setState({ [key]: Number.parseInt(event.target.value) })
     }
-  }
-
-  private handleChangeShopName = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    this.setState(() => ({ shopName: event.target.value }))
-    // TODO get Suggests
-  }
-
-  private handleChangeStock = (id: number) => (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const newState = Object.assign({}, this.state)
-    newState.stocks[id].quantity = Number.parseInt(event.target.value)
-    this.setState(newState)
   }
 }
 

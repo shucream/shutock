@@ -1,14 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import {
-  Button,
-  IconButton,
-  InputBase,
-  Paper,
-  Link as UILink,
-  MenuItem,
-  Menu
-} from '@material-ui/core'
+import { IconButton, InputBase, Paper, MenuItem, Menu } from '@material-ui/core'
 import { Add, Search } from '@material-ui/icons'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
 import { parse } from 'query-string'
@@ -83,6 +75,12 @@ class Header extends React.Component<Props, State> {
               style={{ textDecoration: 'none', color: 'black' }}
             >
               <MenuItem>add Shop</MenuItem>
+            </Link>
+            <Link
+              to={'/stocks/new'}
+              style={{ textDecoration: 'none', color: 'black' }}
+            >
+              <MenuItem>add Stock</MenuItem>
             </Link>
           </Menu>
         </RightContents>
