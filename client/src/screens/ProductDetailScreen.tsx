@@ -5,13 +5,6 @@ import Title from '../components/atoms/Title'
 import { ProductDto } from '../dto/ProductDto'
 import Description from '../components/atoms/Description'
 import { Button, Grid } from '@material-ui/core'
-import {
-  ButtonBack,
-  ButtonNext,
-  CarouselProvider,
-  Slide,
-  Slider
-} from 'pure-react-carousel'
 import ShopList from '../components/organisms/ShopList'
 import { ShopDto } from '../dto/ShopDto'
 import Loading from '../components/atoms/Loading'
@@ -78,12 +71,17 @@ class ProductDetailScreen extends React.Component<Props, State> {
                 <img
                   src={product.product_images[0].large}
                   style={{ width: '100%' }}
+                  alt={'img'}
                 />
               </MainImageBox>
               <SubImageList>
                 {product.product_images.map(image => (
                   <SubImageBox>
-                    <img src={image.thumbnail} style={{ width: '100%' }} />
+                    <img
+                      src={image.thumbnail}
+                      style={{ width: '100%' }}
+                      alt={'img'}
+                    />
                   </SubImageBox>
                 ))}
               </SubImageList>

@@ -1,16 +1,12 @@
 import React from 'react'
-import { ProductDto } from '../../dto/ProductDto'
 import {
-  Box,
   Card,
   CardActionArea,
   CardContent,
   CardMedia,
   Grid,
-  Paper,
   Typography
 } from '@material-ui/core'
-import { Link } from 'react-router-dom'
 import StyledLink from '../atoms/StyledLink'
 import { ShopDto } from '../../dto/ShopDto'
 

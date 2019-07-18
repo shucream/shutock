@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import { RouteComponentProps } from 'react-router'
 import Section from '../components/atoms/Section'
 import { ProductDto } from '../dto/ProductDto'
-import ProductListItem from '../components/organisms/ProductListItem'
 import ProductList from '../components/organisms/ProductList'
 
 type Props = RouteComponentProps

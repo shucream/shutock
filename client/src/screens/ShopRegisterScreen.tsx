@@ -1,5 +1,4 @@
 import React from 'react'
-import styled from 'styled-components'
 import { Button, TextField } from '@material-ui/core'
 import Title from '../components/atoms/Title'
 import ImageDropZone from '../components/molecules/ImageDropZone'
