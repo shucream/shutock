@@ -52,4 +52,4 @@ Rails.application.configure do
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 end
 
-Rails.application.routes.default_url_options = { host: 'localhost' }
+Rails.application.routes.default_url_options = { host: 'localhost:8080' }
