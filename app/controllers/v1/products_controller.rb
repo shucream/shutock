@@ -11,8 +11,8 @@ class V1::ProductsController < ApplicationController
         quantity: stock_attributes[:quantity]
       )
     end
-    create_product_params[:images]&.each do |image_attributes|
-      @product.product_images.new(image_attributes)
+    create_product_params[:images]&.each do |image|
+      @product.product_images.new(image: image)
     end
     @product.save!
     render json: @product, serializer: V1::ProductSerializer, include: [{product_images: []}, { stocks: [:shop]}]
@@ -42,10 +42,7 @@ class V1::ProductsController < ApplicationController
       :name,
       :description,
       :price,
-      images: %i[
-        name
-        image
-      ],
+      images: [],
       stocks: %i[
         shop_id
         quantity

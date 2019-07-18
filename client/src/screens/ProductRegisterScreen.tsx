@@ -6,13 +6,14 @@ import Description from '../components/atoms/Description'
 import Section from '../components/atoms/Section'
 import TextFieldRow from '../components/atoms/TextFieldRow'
 import ImageDropZone from '../components/molecules/ImageDropZone'
+import ApiClient from '../lib/ApiClient'
 
 interface Props {}
 
 interface State {
   name: string
   description: string
-  price: number | null
+  price: string
   images: File[]
 }
 
@@ -20,7 +21,7 @@ class ProductRegisterScreen extends React.Component<Props, State> {
   public state: State = {
     name: '',
     description: '',
-    price: null,
+    price: '',
     images: []
   }
 
@@ -67,7 +68,9 @@ class ProductRegisterScreen extends React.Component<Props, State> {
           />
         </Section>
         <Section>
-          <Button variant="outlined">保存</Button>
+          <Button variant="outlined" onClick={this.submit}>
+            保存
+          </Button>
         </Section>
       </Container>
     )
@@ -88,6 +91,24 @@ class ProductRegisterScreen extends React.Component<Props, State> {
       // @ts-ignore
       this.setState({ [key]: Number.parseInt(event.target.value) })
     }
+  }
+
+  private submit = () => {
+    console.log(this.state)
+    const formData = new FormData()
+    formData.append('name', this.state.name)
+    formData.append('description', this.state.description)
+    formData.append('price', this.state.price.toString())
+    this.state.images.forEach(file => {
+      formData.append('images[]', file)
+    })
+    ApiClient.postData('/v1/products/', formData).then(response => {
+      if (response.success) {
+        console.log(response.data)
+      } else {
+        console.log(response.detail)
+      }
+    })
   }
 }
 
