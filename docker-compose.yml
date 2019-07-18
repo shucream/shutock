@@ -34,6 +34,8 @@ services:
         build: client/
         ports:
             - "3001:3001"
+        environment:
+            - REACT_APP_ENVIRONMENT = development
         command: yarn start
         volumes:
             - ./client:/usr/src/client
