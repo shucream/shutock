@@ -1,2 +1,3 @@
-FROM nginx:latest
-COPY nginx.conf /etc/nginx/nginx.conf
+FROM nginx:perl
+ADD nginx.conf /etc/nginx/nginx.conf
+CMD ["nginx", "-g", "daemon off; load_module /etc/nginx/modules/ngx_http_perl_module-debug.so;"]

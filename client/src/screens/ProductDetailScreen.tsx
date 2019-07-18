@@ -16,8 +16,10 @@ import ShopList from '../components/organisms/ShopList'
 import { ShopDto } from '../dto/ShopDto'
 import Loading from '../components/atoms/Loading'
 import StyledLink from '../components/atoms/StyledLink'
+import { RouteComponentProps } from 'react-router'
+import ApiClient from '../lib/ApiClient'
 
-interface Props {}
+type Props = RouteComponentProps<{ id: string }>
 
 interface State {
   product?: ProductDto
@@ -52,6 +54,17 @@ class ProductDetailScreen extends React.Component<Props, State> {
     }
   }
 
+  public componentDidMount(): void {
+    ApiClient.get<ProductDto>(
+      `/v1/products/${this.props.match.params.id}`
+    ).then(response => {
+      if (response.success) {
+        this.setState({ product: response.data })
+        console.log(response)
+      }
+    })
+  }
+
   public render() {
     if (!this.state.product) {
       return <Loading />
@@ -76,7 +89,7 @@ class ProductDetailScreen extends React.Component<Props, State> {
               </SubImageList>
             </Block>
             <Block
-              style={{ margin: 10, display: 'flex', alignItems: 'flex-end' }}
+              style={{ margin: 10, display: 'flex', flexDirection: 'column' }}
             >
               <div>
                 <Title>{product.name}</Title>

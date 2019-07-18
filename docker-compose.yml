@@ -21,5 +21,24 @@ services:
         networks:
           - shutock_network
 
+    nginx:
+        build: nginx/
+        ports:
+            - "8080:80"
+        environment:
+            - CLIENT_HOST=localhost:3001
+        networks:
+          - shutock_network
+
+    client:
+        build: client/
+        ports:
+            - "3001:3001"
+        command: yarn start
+        volumes:
+            - ./client:/usr/src/client
+        networks:
+          - shutock_network
+
 networks:
     shutock_network:

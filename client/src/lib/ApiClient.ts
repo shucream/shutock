@@ -93,8 +93,8 @@ export default class ApiClient {
    */
   protected static getUrl(path: string) {
     const host =
-      process.env.ENVIRONMENT === 'development'
-        ? 'localhost'
+      process.env.REACT_APP_ENVIRONMENT === 'development'
+        ? 'localhost:3000/api'
         : '3.112.204.124/api'
     return `http://${host}${path}`
   }
