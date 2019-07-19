@@ -7,30 +7,95 @@ import Section from '../components/atoms/Section'
 import TextFieldRow from '../components/atoms/TextFieldRow'
 import ImageDropZone from '../components/molecules/ImageDropZone'
 import ApiClient from '../lib/ApiClient'
+import { RouteComponentProps} from 'react-router';
+import { ProductDto, ProductImageDto } from '../dto/ProductDto';
 
-interface Props {}
+type Props = RouteComponentProps<{id?: string}>;
 
 interface State {
   name: string
   description: string
   price: string
   images: File[]
+  imageList: ProductImageDto[]
+  config: ModeConfig
 }
 
-class ProductRegisterScreen extends React.Component<Props, State> {
-  public state: State = {
-    name: '',
-    description: '',
-    price: '',
-    images: []
+interface Mode {
+  new: ModeConfig
+  edit: ModeConfig
+}
+
+interface ModeConfig {
+  title: string
+  subtitle: string
+  submitLabel: string
+  preset: boolean
+}
+
+const modeConfig: Mode = {
+  new: {
+    title: '新規商品登録',
+    subtitle: '新しい商品を登録します。',
+    submitLabel: '登録',
+    preset: false,
+  },
+  edit: {
+    title: '商品編集',
+    subtitle: '商品の情報を更新します。',
+    submitLabel: '更新',
+    preset: true
+  }
+}
+
+const initialState: State = {
+  name: '',
+  description: '',
+  price: '',
+  images: [],
+  imageList: [],
+  config: modeConfig.new
+}
+
+class ProductFormScreen extends React.Component<Props, State> {
+  public state: State = initialState
+
+  constructor(props: Props) {
+    super(props)
+  }
+
+  componentDidMount(): void {
+    if (this.props.match.params.id) {
+      this.setState({config: modeConfig.edit})
+      ApiClient.get<ProductDto>(`/v1/products/${this.props.match.params.id.toString()}`)
+        .then(response => {
+          if (response.success) {
+            this.setState({
+              name: response.data.name,
+              description: response.data.description,
+              price: response.data.price.toString(),
+              images: [],
+              imageList: response.data.product_images
+            })
+          } else {
+            console.log(response.detail)
+          }
+        })
+    }
+  }
+
+  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    if (this.props.match.params.id !== prevProps.match.params.id) {
+      this.setState(initialState)
+    }
   }
 
   public render() {
     return (
       <Container>
         <Section>
-          <Title>Add New Product</Title>
-          <Description>新しい商品を登録します。</Description>
+          <Title>{this.state.config.title}</Title>
+          <Description>{this.state.config.subtitle}</Description>
         </Section>
         <Section>
           <TextField
@@ -69,7 +134,7 @@ class ProductRegisterScreen extends React.Component<Props, State> {
         </Section>
         <Section>
           <Button variant="outlined" onClick={this.submit}>
-            保存
+            {this.state.config.submitLabel}
           </Button>
         </Section>
       </Container>
@@ -102,14 +167,24 @@ class ProductRegisterScreen extends React.Component<Props, State> {
     this.state.images.forEach(file => {
       formData.append('images[]', file)
     })
-    ApiClient.postData('/v1/products/', formData).then(response => {
-      if (response.success) {
-        console.log(response.data)
-      } else {
-        console.log(response.detail)
-      }
-    })
+    if (this.props.match.params.id) {
+      ApiClient.patchData(`/v1/products/${this.props.match.params.id}`, formData).then(response => {
+        if (response.success) {
+          console.log(response.data)
+        } else {
+          console.log(response.detail)
+        }
+      })
+    } else {
+      ApiClient.postData('/v1/products/', formData).then(response => {
+        if (response.success) {
+          console.log(response.data)
+        } else {
+          console.log(response.detail)
+        }
+      })
+    }
   }
 }
 
-export default ProductRegisterScreen
+export default ProductFormScreen
