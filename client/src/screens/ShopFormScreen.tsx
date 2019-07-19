@@ -6,28 +6,88 @@ import Description from '../components/atoms/Description'
 import Section from '../components/atoms/Section'
 import Container from '../components/atoms/Container'
 import ApiClient from '../lib/ApiClient'
+import { RouteComponentProps } from 'react-router';
+import { ShopDto, ShopImageDto } from '../dto/ShopDto';
 
-interface Props {}
+type Props = RouteComponentProps<{id?: string}>;
 
 interface State {
   name: string
   address: string
   images: File[]
+  imageList: ShopImageDto[]
+  config: ModeConfig
 }
 
-class ShopRegisterScreen extends React.Component<Props, State> {
-  public state: State = {
-    name: '',
-    address: '',
-    images: []
+interface Mode {
+  new: ModeConfig
+  edit: ModeConfig
+}
+
+interface ModeConfig {
+  title: string
+  subtitle: string
+  submitLabel: string
+  preset: boolean
+}
+
+const modeConfig: Mode = {
+  new: {
+    title: '新規店鋪登録',
+    subtitle: '新しい店鋪を登録します。',
+    submitLabel: '登録',
+    preset: false,
+  },
+  edit: {
+    title: '店鋪編集',
+    subtitle: '店鋪の情報を更新します。',
+    submitLabel: '更新',
+    preset: true
+  }
+}
+
+const initialState: State = {
+  name: '',
+  address: '',
+  images: [],
+  imageList: [],
+  config: modeConfig.new
+}
+
+class ShopFormScreen extends React.Component<Props, State> {
+  public state: State = initialState
+
+  componentDidMount(): void {
+    if (this.props.match.params.id) {
+      this.setState({config: modeConfig.edit})
+      ApiClient.get<ShopDto>(`/v1/shops/${this.props.match.params.id.toString()}`)
+        .then(response => {
+          if (response.success) {
+            this.setState({
+              name: response.data.name,
+              address: response.data.address,
+              images: [],
+              imageList: response.data.shop_images
+            })
+          } else {
+            console.log(response.detail)
+          }
+        })
+    }
+  }
+
+  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    if (this.props.match.params.id !== prevProps.match.params.id) {
+      this.setState(initialState)
+    }
   }
 
   public render() {
     return (
       <Container>
         <Section>
-          <Title>Add New Shop</Title>
-          <Description>新しい店舗を登録します。</Description>
+          <Title>{this.state.config.title}</Title>
+          <Description>{this.state.config.subtitle}</Description>
         </Section>
         <Section>
           <TextField
@@ -56,7 +116,7 @@ class ShopRegisterScreen extends React.Component<Props, State> {
         </Section>
         <Section>
           <Button variant="outlined" onClick={this.submit}>
-            保存
+            {this.state.config.submitLabel}
           </Button>
         </Section>
       </Container>
@@ -87,14 +147,22 @@ class ShopRegisterScreen extends React.Component<Props, State> {
     this.state.images.forEach(image => {
       formData.append('images[]', image)
     })
-    ApiClient.postData('/v1/shops/', formData).then(response => {
+    if (this.props.match.params.id) {
+      ApiClient.patchData(`/v1/shops/${this.props.match.params.id}`, formData).then(response => {
+        if (response.success) {
+          console.log(response.data)
+        } else {
+          console.log(response.detail)
+        }
+      })
+    } else { ApiClient.postData('/v1/shops/', formData).then(response => {
       if (response.success) {
         console.log(response.data)
       } else {
         console.log(response.detail)
       }
-    })
+    })}
   }
 }
 
-export default ShopRegisterScreen
+export default ShopFormScreen

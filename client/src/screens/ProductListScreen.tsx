@@ -14,47 +14,7 @@ interface State {
 
 class ProductListScreen extends React.Component<Props, State> {
   public state: State = {
-    results: [
-      {
-        id: 1,
-        name: '名前',
-        description: '説明文',
-        price: 400,
-        product_images: [
-          {
-            thumbnail: 'http://www.marond.com/images/bread/bread_al_200.jpg',
-            large: 'http://www.marond.com/images/bread/bread_al_200.jpg'
-          }
-        ],
-        stocks: []
-      },
-      {
-        id: 2,
-        name: '名前',
-        description: '説明文',
-        price: 400,
-        product_images: [
-          {
-            thumbnail: 'http://www.marond.com/images/bread/bread_al_200.jpg',
-            large: 'http://www.marond.com/images/bread/bread_al_200.jpg'
-          }
-        ],
-        stocks: []
-      },
-      {
-        id: 3,
-        name: '名前',
-        description: '説明文',
-        price: 400,
-        product_images: [
-          {
-            thumbnail: 'http://www.marond.com/images/bread/bread_al_200.jpg',
-            large: 'http://www.marond.com/images/bread/bread_al_200.jpg'
-          }
-        ],
-        stocks: []
-      }
-    ]
+    results: []
   }
 
   public componentDidMount(): void {

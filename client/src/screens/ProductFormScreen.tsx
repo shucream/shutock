@@ -7,10 +7,10 @@ import Section from '../components/atoms/Section'
 import TextFieldRow from '../components/atoms/TextFieldRow'
 import ImageDropZone from '../components/molecules/ImageDropZone'
 import ApiClient from '../lib/ApiClient'
-import { RouteComponentProps} from 'react-router';
-import { ProductDto, ProductImageDto } from '../dto/ProductDto';
+import { RouteComponentProps } from 'react-router'
+import { ProductDto, ProductImageDto } from '../dto/ProductDto'
 
-type Props = RouteComponentProps<{id?: string}>;
+type Props = RouteComponentProps<{ id?: string }>
 
 interface State {
   name: string
@@ -38,7 +38,7 @@ const modeConfig: Mode = {
     title: '新規商品登録',
     subtitle: '新しい商品を登録します。',
     submitLabel: '登録',
-    preset: false,
+    preset: false
   },
   edit: {
     title: '商品編集',
@@ -60,31 +60,32 @@ const initialState: State = {
 class ProductFormScreen extends React.Component<Props, State> {
   public state: State = initialState
 
-  constructor(props: Props) {
-    super(props)
-  }
-
   componentDidMount(): void {
     if (this.props.match.params.id) {
-      this.setState({config: modeConfig.edit})
-      ApiClient.get<ProductDto>(`/v1/products/${this.props.match.params.id.toString()}`)
-        .then(response => {
-          if (response.success) {
-            this.setState({
-              name: response.data.name,
-              description: response.data.description,
-              price: response.data.price.toString(),
-              images: [],
-              imageList: response.data.product_images
-            })
-          } else {
-            console.log(response.detail)
-          }
-        })
+      this.setState({ config: modeConfig.edit })
+      ApiClient.get<ProductDto>(
+        `/v1/products/${this.props.match.params.id.toString()}`
+      ).then(response => {
+        if (response.success) {
+          this.setState({
+            name: response.data.name,
+            description: response.data.description,
+            price: response.data.price.toString(),
+            images: [],
+            imageList: response.data.product_images
+          })
+        } else {
+          console.log(response.detail)
+        }
+      })
     }
   }
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+  componentDidUpdate(
+    prevProps: Readonly<Props>,
+    prevState: Readonly<State>,
+    snapshot?: any
+  ): void {
     if (this.props.match.params.id !== prevProps.match.params.id) {
       this.setState(initialState)
     }
@@ -168,7 +169,10 @@ class ProductFormScreen extends React.Component<Props, State> {
       formData.append('images[]', file)
     })
     if (this.props.match.params.id) {
-      ApiClient.patchData(`/v1/products/${this.props.match.params.id}`, formData).then(response => {
+      ApiClient.patchData(
+        `/v1/products/${this.props.match.params.id}`,
+        formData
+      ).then(response => {
         if (response.success) {
           console.log(response.data)
         } else {
