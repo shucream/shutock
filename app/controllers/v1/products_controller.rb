@@ -19,7 +19,7 @@ class V1::ProductsController < ApplicationController
   end
 
   def index
-    render json: Product.all, each_serializer: V1::ProductSerializer, include: {}
+    render json: Product.all, each_serializer: V1::ProductSerializer, include: { product_images: [] }
   end
 
   def show

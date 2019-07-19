@@ -4,6 +4,7 @@ import { RouteComponentProps } from 'react-router'
 import Section from '../components/atoms/Section'
 import { ProductDto } from '../dto/ProductDto'
 import ProductList from '../components/organisms/ProductList'
+import ApiClient from '../lib/ApiClient'
 
 type Props = RouteComponentProps
 
@@ -54,6 +55,15 @@ class ProductListScreen extends React.Component<Props, State> {
         stocks: []
       }
     ]
+  }
+
+  public componentDidMount(): void {
+    ApiClient.get<ProductDto[]>('/v1/products/').then(response => {
+      if (response.success) {
+        console.log(response.data)
+        this.setState({ results: response.data })
+      }
+    })
   }
 
   public render() {

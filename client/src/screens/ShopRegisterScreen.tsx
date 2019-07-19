@@ -5,6 +5,7 @@ import ImageDropZone from '../components/molecules/ImageDropZone'
 import Description from '../components/atoms/Description'
 import Section from '../components/atoms/Section'
 import Container from '../components/atoms/Container'
+import ApiClient from '../lib/ApiClient'
 
 interface Props {}
 
@@ -54,7 +55,9 @@ class ShopRegisterScreen extends React.Component<Props, State> {
           />
         </Section>
         <Section>
-          <Button variant="outlined">保存</Button>
+          <Button variant="outlined" onClick={this.submit}>
+            保存
+          </Button>
         </Section>
       </Container>
     )
@@ -75,6 +78,22 @@ class ShopRegisterScreen extends React.Component<Props, State> {
       // @ts-ignore
       this.setState({ [key]: Number.parseInt(event.target.value) })
     }
+  }
+
+  private submit = () => {
+    const formData = new FormData()
+    formData.append('name', this.state.name)
+    formData.append('address', this.state.address)
+    this.state.images.forEach(image => {
+      formData.append('images[]', image)
+    })
+    ApiClient.postData('/v1/shops/', formData).then(response => {
+      if (response.success) {
+        console.log(response.data)
+      } else {
+        console.log(response.detail)
+      }
+    })
   }
 }
 

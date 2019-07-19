@@ -69,7 +69,9 @@ class ProductDetailScreen extends React.Component<Props, State> {
             <Block>
               <MainImageBox>
                 <img
-                  src={product.product_images[0].large}
+                  src={
+                    product.product_images[0] && product.product_images[0].large
+                  }
                   style={{ width: '100%' }}
                   alt={'img'}
                 />

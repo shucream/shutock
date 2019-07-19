@@ -10,8 +10,8 @@ class V1::ShopsController < ApplicationController
 
   def create
     @shop = Shop.new(create_shop_params.slice(:name, :address))
-    create_shop_params[:images]&.each do |image_data|
-      @shop.shop_images.new(image_data)
+    create_shop_params[:images]&.each do |image|
+      @shop.shop_images.new(image: image)
     end
     @shop.save!
     render json: @shop, serializer: V1::ShopSerializer, include: { shop_images: [] }
@@ -30,7 +30,7 @@ class V1::ShopsController < ApplicationController
   private
 
   def create_shop_params
-    params.permit(:name, :address, images: %i[ image ])
+    params.permit(:name, :address, images: [])
   end
 
   def update_shop_params
