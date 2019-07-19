@@ -82,6 +82,9 @@ workflows:
           tag: '${CIRCLE_SHA1}'
           requires:
             - api-test
+          filters:
+            branches:
+              only: develop
       - aws-ecs/deploy-service-update:
           requires:
             - build-push
@@ -89,18 +92,10 @@ workflows:
           cluster-name: 'shutock-app-cluster'
           service-name: 'shutock-app-ec2'
           container-image-name-updates: 'container=rails,tag=${CIRCLE_SHA1}'
-#      - api-release-image:
-#          requires:
-#            - api-test
-#          filters:
-#            branches:
-#              only: production
-#      - api-deployment:
-#          requires:
-#            - api-release-image
-#          filters:
-#            branches:
-#              only: production
+          filters:
+            branches:
+              only: develop
+
   nginx:
     jobs:
       - aws-ecr/build-and-push-image:
@@ -109,6 +104,9 @@ workflows:
           tag: '${CIRCLE_SHA1}'
           dockerfile: nginx/Dockerfile
           path: nginx/
+          filters:
+            branches:
+              only: develop
       - aws-ecs/deploy-service-update:
           requires:
             - build-push
@@ -116,14 +114,10 @@ workflows:
           cluster-name: 'shutock-app-cluster'
           service-name: 'shutock-app-ec2'
           container-image-name-updates: 'container=nginx,tag=${CIRCLE_SHA1}'
-#      - nginx-build
-#      - nginx-deployment:
-#          requires:
-#            - nginx-build
-#          filters:
-#            branches:
-#              only: production
 
   client:
     jobs:
-      - client-build-deployment
+      - client-build-deployment:
+          filters:
+            branches:
+              only: production
