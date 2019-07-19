@@ -95,7 +95,7 @@ export default class ApiClient {
     const host =
       process.env.REACT_APP_ENVIRONMENT === 'development'
         ? 'localhost:80/api'
-        : 'http://3.112.204.124/api'
+        : '3.112.204.124/api'
 
     return `http://${host}${path}`
   }
