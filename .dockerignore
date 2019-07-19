@@ -1,2 +1,4 @@
 client/
 nginx/
+docker-compose.yml
+storage/

@@ -12,42 +12,29 @@ interface State {
   results: ProductDto[]
 }
 
-class SearchResultScreen extends React.Component<Props, State> {
+class ProductListScreen extends React.Component<Props, State> {
   public state: State = {
     results: []
   }
 
-  componentDidMount(): void {
-    this.search()
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (this.props.location.search !== prevProps.location.search) {
-      this.search()
-    }
+  public componentDidMount(): void {
+    ApiClient.get<ProductDto[]>('/v1/products/').then(response => {
+      if (response.success) {
+        console.log(response.data)
+        this.setState({ results: response.data })
+      }
+    })
   }
 
   public render() {
     return (
       <Background>
-        <Section>検索結果</Section>
+        <Section>全商品</Section>
         <Section>
           <ProductList products={this.state.results} />
         </Section>
       </Background>
     )
-  }
-
-  private search() {
-    const q = this.props.location.search.replace(/\?q=/, '')
-    ApiClient.get<ProductDto[]>(`/v1/search/products?q=${q}`).then(response => {
-      if (response.success) {
-        console.log(response)
-        this.setState({ results: response.data })
-      } else {
-        console.log(response)
-      }
-    })
   }
 }
 
@@ -56,4 +43,4 @@ const Background = styled.div`
   height: 100px;
 `
 
-export default SearchResultScreen
+export default ProductListScreen
