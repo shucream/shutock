@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 import ApiClient from '../lib/ApiClient'
-import { ProductDto } from '../dto/ProductDto'
 import { ShopDto } from '../dto/ShopDto'
 import ShopList from '../components/organisms/ShopList'
 import Section from '../components/atoms/Section'

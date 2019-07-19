@@ -11,6 +11,7 @@ import Loading from '../components/atoms/Loading'
 import StyledLink from '../components/atoms/StyledLink'
 import { RouteComponentProps } from 'react-router'
 import ApiClient from '../lib/ApiClient'
+import ImageCarousel from '../components/organisms/ImageCarousel'
 
 type Props = RouteComponentProps<{ id: string }>
 
@@ -19,33 +20,7 @@ interface State {
 }
 
 class ProductDetailScreen extends React.Component<Props, State> {
-  public state: State = {
-    product: {
-      id: 1,
-      name: 'iOSいいパン',
-      description: '遊んで遊んで遊んで遊んで',
-      price: 10000,
-      product_images: [
-        {
-          thumbnail: 'http://www.marond.com/images/bread/bread_al_200.jpg',
-          large: 'http://www.marond.com/images/bread/bread_al_200.jpg'
-        },
-        {
-          thumbnail: 'http://www.marond.com/images/bread/bread_al_200.jpg',
-          large: 'http://www.marond.com/images/bread/bread_al_200.jpg'
-        },
-        {
-          thumbnail: 'http://www.marond.com/images/bread/bread_al_200.jpg',
-          large: 'http://www.marond.com/images/bread/bread_al_200.jpg'
-        },
-        {
-          thumbnail: 'http://www.marond.com/images/bread/bread_al_200.jpg',
-          large: 'http://www.marond.com/images/bread/bread_al_200.jpg'
-        }
-      ],
-      stocks: []
-    }
-  }
+  public state: State = {}
 
   public componentDidMount(): void {
     ApiClient.get<ProductDto>(
@@ -67,29 +42,18 @@ class ProductDetailScreen extends React.Component<Props, State> {
         <Background>
           <Section style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap' }}>
             <Block>
-              <MainImageBox>
-                <img
-                  src={
-                    product.product_images[0] && product.product_images[0].large
-                  }
-                  style={{ width: '100%' }}
-                  alt={'img'}
-                />
-              </MainImageBox>
-              <SubImageList>
-                {product.product_images.map(image => (
-                  <SubImageBox>
-                    <img
-                      src={image.thumbnail}
-                      style={{ width: '100%' }}
-                      alt={'img'}
-                    />
-                  </SubImageBox>
-                ))}
-              </SubImageList>
+              <ImageCarousel
+                data={product.product_images}
+                style={{ flex: 1 }}
+              />
             </Block>
             <Block
-              style={{ margin: 10, display: 'flex', flexDirection: 'column' }}
+              style={{
+                margin: 10,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-end'
+              }}
             >
               <div>
                 <Title>{product.name}</Title>

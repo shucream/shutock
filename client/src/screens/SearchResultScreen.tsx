@@ -4,6 +4,7 @@ import { RouteComponentProps } from 'react-router'
 import Section from '../components/atoms/Section'
 import { ProductDto } from '../dto/ProductDto'
 import ProductList from '../components/organisms/ProductList'
+import ApiClient from '../lib/ApiClient'
 
 type Props = RouteComponentProps
 
@@ -13,47 +14,17 @@ interface State {
 
 class SearchResultScreen extends React.Component<Props, State> {
   public state: State = {
-    results: [
-      {
-        id: 1,
-        name: '名前',
-        description: '説明文',
-        price: 400,
-        product_images: [
-          {
-            thumbnail: 'http://www.marond.com/images/bread/bread_al_200.jpg',
-            large: 'http://www.marond.com/images/bread/bread_al_200.jpg'
-          }
-        ],
-        stocks: []
-      },
-      {
-        id: 2,
-        name: '名前',
-        description: '説明文',
-        price: 400,
-        product_images: [
-          {
-            thumbnail: 'http://www.marond.com/images/bread/bread_al_200.jpg',
-            large: 'http://www.marond.com/images/bread/bread_al_200.jpg'
-          }
-        ],
-        stocks: []
-      },
-      {
-        id: 3,
-        name: '名前',
-        description: '説明文',
-        price: 400,
-        product_images: [
-          {
-            thumbnail: 'http://www.marond.com/images/bread/bread_al_200.jpg',
-            large: 'http://www.marond.com/images/bread/bread_al_200.jpg'
-          }
-        ],
-        stocks: []
-      }
-    ]
+    results: []
+  }
+
+  componentDidMount(): void {
+    this.search()
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    if (this.props.location.search !== prevProps.location.search) {
+      this.search()
+    }
   }
 
   public render() {
@@ -65,6 +36,18 @@ class SearchResultScreen extends React.Component<Props, State> {
         </Section>
       </Background>
     )
+  }
+
+  private search() {
+    const q = this.props.location.search.replace(/\?q=/, '')
+    ApiClient.get<ProductDto[]>(`/v1/search/products?q=${q}`).then(response => {
+      if (response.success) {
+        console.log(response)
+        this.setState({ results: response.data })
+      } else {
+        console.log(response)
+      }
+    })
   }
 }
 

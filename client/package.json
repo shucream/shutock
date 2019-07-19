@@ -12,6 +12,7 @@
     "@types/react-dom": "16.8.4",
     "@types/react-dropzone": "^5.1.0",
     "@types/react-router-dom": "^4.3.4",
+    "@types/react-swipeable-views": "^0.13.0",
     "@types/styled-components": "^4.1.17",
     "husky": "^3.0.0",
     "lint-staged": "^9.1.0",
@@ -23,6 +24,8 @@
     "react-dropzone": "^10.1.5",
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.0.1",
+    "react-swipeable-views": "^0.13.3",
+    "react-swipeable-views-utils": "^0.13.3",
     "styled-components": "^4.3.2",
     "typescript": "3.5.3"
   },
