@@ -23,7 +23,9 @@ const ProductListItem: React.FC<Props> = props => {
         <CardActionArea>
           <CardMedia
             image={
-              product.product_images[0] && product.product_images[0].thumbnail
+              product.product_images &&
+              product.product_images[0] &&
+              product.product_images[0].thumbnail
             }
             style={{ height: 0, paddingTop: '56.25%' }}
           />

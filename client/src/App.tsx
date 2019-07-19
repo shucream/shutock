@@ -8,7 +8,7 @@ import ShopDetailScreen from './screens/ShopDetailScreen'
 import ProductDetailScreen from './screens/ProductDetailScreen'
 import SearchResultScreen from './screens/SearchResultScreen'
 import NotFoundScreen from './screens/NotFoundScreen'
-import StockRegisterScreen from './screens/StockRegisterScreen'
+import StockFormScreen from './screens/StockFormScreen'
 import ProductListScreen from './screens/ProductListScreen'
 import ProductFormScreen from './screens/ProductFormScreen'
 
@@ -27,7 +27,7 @@ const App: React.FC = () => {
         <Route exact path="/products/new" component={ProductFormScreen} />
         <Route exact path="/products/:id" component={ProductDetailScreen} />
         <Route exact path="/products/:id/edit" component={ProductFormScreen} />
-        <Route exact path="/stocks/new" component={StockRegisterScreen} />
+        <Route exact path="/stocks/new" component={StockFormScreen} />
         <Route component={NotFoundScreen} />
       </Switch>
     </BrowserRouter>

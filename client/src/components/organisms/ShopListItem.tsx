@@ -22,7 +22,11 @@ const ShopListItem: React.FC<Props> = props => {
       <StyledLink to={'/shops/' + shop.id.toString()}>
         <CardActionArea>
           <CardMedia
-            image={shop.shop_images[0] && shop.shop_images[0].thumbnail}
+            image={
+              shop.shop_images &&
+              shop.shop_images[0] &&
+              shop.shop_images[0].thumbnail
+            }
             style={{ height: 0, paddingTop: '56.25%' }}
           />
           <CardContent>
