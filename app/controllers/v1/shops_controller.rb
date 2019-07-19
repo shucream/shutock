@@ -18,13 +18,24 @@ class V1::ShopsController < ApplicationController
   end
 
   def update
-    @shop = Shop.update!(update_shop_params)
+    @shop = Shop.find(params[:id])
+    Shop.transaction do
+      @shop.update!(
+        name: update_shop_params[:name],
+        address: update_shop_params[:address],
+      )
+      update_shop_params[:images]&.each do |image|
+        @shop.shop_images.new(image: image)
+      end
+      @shop.save!
+    end
     render json: @shop, serializer: V1::ShopSerializer, include: { shop_images: [], stocks: [:product] }
   end
 
   def destroy
     @shop = Shop.find(params[:id])
-    render json: @shop.destroy!
+    @shop.destroy()
+    render json: []
   end
 
   private
@@ -34,6 +45,6 @@ class V1::ShopsController < ApplicationController
   end
 
   def update_shop_params
-    params.permit(:name, :address)
+    params.permit(:id, :name, :address, images: [])
   end
 end

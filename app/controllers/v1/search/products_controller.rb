@@ -1,7 +1,7 @@
 class V1::Search::ProductsController < ApplicationController
   def index
     @result = Product.search_name(search_params[:q])
-    render json: @result, each_serializer: V1::ProductSerializer, include: {}
+    render json: @result, each_serializer: V1::ProductSerializer, include: { product_images: [] }
   end
 
   private

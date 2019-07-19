@@ -5,12 +5,6 @@ class V1::ProductsController < ApplicationController
       description: create_product_params[:description],
       price: create_product_params[:price].to_i
     )
-    create_product_params[:stocks]&.each do |stock_attributes|
-      @product.stocks.new(
-        shop_id: stock_attributes[:shop_id].to_i,
-        quantity: stock_attributes[:quantity]
-      )
-    end
     create_product_params[:images]&.each do |image|
       @product.product_images.new(image: image)
     end
@@ -29,11 +23,25 @@ class V1::ProductsController < ApplicationController
 
   def update
     @product = Product.find(params[:id])
-    @product.update!(update_product_params)
-    render json: @product, serializer: V1::ProductSerializer, include: { stocks: [:shop] }
+    Product.transaction do
+      @product.update!({
+           name: update_product_params[:name],
+           description: update_product_params[:description],
+           price: update_product_params[:price]
+       })
+      update_product_params[:images]&.each do |image|
+        @product.product_images.new(image: image)
+      end
+      @product.save!
+    end
+    render json: @product, serializer: V1::ProductSerializer, include: { product_images: [] }
   end
 
-  def destroy; end
+  def destroy
+    @product = Product.find(params[:id])
+    @product.destroy()
+    render json: []
+  end
 
   private
 
@@ -42,19 +50,17 @@ class V1::ProductsController < ApplicationController
       :name,
       :description,
       :price,
-      images: [],
-      stocks: %i[
-        shop_id
-        quantity
-      ]
+      images: []
     )
   end
 
   def update_product_params
     params.permit(
+      :id,
       :name,
       :description,
-      :price
+      :price,
+      images: []
     )
   end
 end
