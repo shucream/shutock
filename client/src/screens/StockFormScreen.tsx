@@ -5,14 +5,7 @@ import Title from '../components/atoms/Title'
 import Container from '../components/atoms/Container'
 import { ProductDto } from '../dto/ProductDto'
 import { ShopDto } from '../dto/ShopDto'
-import {
-  Button,
-  Menu,
-  MenuItem,
-  Paper,
-  Popper,
-  TextField
-} from '@material-ui/core'
+import { Button, MenuItem, Paper, Popper, TextField } from '@material-ui/core'
 import ApiClient from '../lib/ApiClient'
 import _ from 'lodash'
 

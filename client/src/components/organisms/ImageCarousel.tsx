@@ -2,13 +2,7 @@ import React, { CSSProperties } from 'react'
 import SwipeableViews from 'react-swipeable-views'
 // @ts-ignore
 import { autoPlay } from 'react-swipeable-views-utils'
-import {
-  Button,
-  MobileStepper,
-  Paper,
-  Typography,
-  useTheme
-} from '@material-ui/core'
+import { Button, MobileStepper, useTheme } from '@material-ui/core'
 import { ProductImageDto } from '../../dto/ProductDto'
 import { ShopImageDto } from '../../dto/ShopDto'
 import { KeyboardArrowLeft, KeyboardArrowRight } from '@material-ui/icons'

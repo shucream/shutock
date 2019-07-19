@@ -98,24 +98,6 @@ const Background = styled.div`
   width: 100%;
 `
 
-const MainImageBox = styled.div`
-  display: flex;
-  height: auto;
-  margin-bottom: 3px;
-`
-
-const SubImageList = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-`
-
-const SubImageBox = styled.div`
-  flex: 1;
-  max-width: 20%;
-  min-width: 20%;
-`
-
 const Block = styled.div`
   flex: 1;
   min-width: 300px;
