@@ -22,7 +22,6 @@ class HomeScreen extends React.Component<Props, {}> {
 
 const Background = styled.div`
   width: 100%;
-  height: 100px;
 `
 
 export default HomeScreen

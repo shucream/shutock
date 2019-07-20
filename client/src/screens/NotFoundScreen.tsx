@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import { Typography } from '@material-ui/core'
 
 interface Props {}
 
@@ -7,14 +8,16 @@ class NotFoundScreen extends React.Component<Props, {}> {
   public render() {
     return (
       <Background>
-        <p>404 Not Found</p>
+        <Typography>404 Not Found</Typography>
       </Background>
     )
   }
 }
 const Background = styled.div`
-  width: 100%;
-  height: 100px;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-contents: center;
 `
 
 export default NotFoundScreen

@@ -50,6 +50,14 @@ export default class ApiClient {
     return ApiClient.api<T>(url, opt)
   }
 
+  public static async delete<T>(path: string) {
+    const url = ApiClient.getUrl(path)
+    const opt = {
+      method: 'DELETE'
+    }
+    return ApiClient.api<T>(url, opt)
+  }
+
   protected static api<T>(url: RequestInfo, opt: RequestInit) {
     return fetch(url, opt)
       .catch(ApiClient.handleNetworkError)

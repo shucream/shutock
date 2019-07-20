@@ -16,23 +16,32 @@ import ProductList from '../components/organisms/ProductList'
 type Props = RouteComponentProps<{ id: string }>
 
 interface State {
-  shop?: ShopDto
+  shop: ShopDto
+  loading: boolean
 }
 
 class ShopDetailScreen extends React.Component<Props, State> {
-  public state: State = {}
+  public state: State = {
+    shop: {
+      id: 0,
+      name: '',
+      address: '',
+      shop_images: [],
+      stocks: []
+    },
+    loading: false
+  }
 
-  public componentDidMount(): void {
-    ApiClient.get<ShopDto>(`/v1/shops/${this.props.match.params.id}`).then(
-      response => {
-        if (response.success) {
-          console.log(response)
-          this.setState({ shop: response.data })
-        } else {
-          //  TODO エラーハンドリング
-        }
-      }
+  public async componentDidMount() {
+    this.setState({ loading: true })
+    const response = await ApiClient.get<ShopDto>(
+      `/v1/shops/${this.props.match.params.id}`
     )
+    if (response.success) {
+      this.setState({ shop: response.data, loading: false })
+    } else {
+      console.log(response.detail)
+    }
   }
 
   public componentDidUpdate(
@@ -46,57 +55,54 @@ class ShopDetailScreen extends React.Component<Props, State> {
   }
 
   public render() {
-    if (!this.state.shop) {
-      return <Loading />
-    } else {
-      const shop = this.state.shop
-      return (
-        <Background>
-          <Section style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap' }}>
-            <Block>
-              <ImageCarousel data={shop.shop_images} style={{ flex: 1 }} />
-            </Block>
-            <Block
-              style={{
-                margin: 10,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-end'
-              }}
-            >
-              <div>
-                <Title>{shop.name}</Title>
-                <Description>{shop.address}</Description>
-              </div>
-              <Grid container justify="flex-end">
-                <StyledLink to={'/shops/' + shop.id.toString() + '/edit'}>
-                  <Button variant="outlined" style={{ marginRight: 10 }}>
-                    編集
-                  </Button>
-                </StyledLink>
-                <StyledLink to={'/shops/' + shop.id.toString() + '/delete'}>
-                  <Button variant="outlined" color="secondary">
-                    削除
-                  </Button>
-                </StyledLink>
-              </Grid>
-            </Block>
-          </Section>
-          <Section>
-            <Title>取扱商品</Title>
-            {this.state.shop.stocks && (
-              <ProductList
-                products={
-                  this.state.shop.stocks.map(
-                    stock => stock.product
-                  ) as ProductDto[]
-                }
-              />
-            )}
-          </Section>
-        </Background>
-      )
-    }
+    const shop = this.state.shop
+    return (
+      <Background>
+        <Section style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap' }}>
+          <Block>
+            <ImageCarousel data={shop.shop_images} style={{ flex: 1 }} />
+          </Block>
+          <Block
+            style={{
+              margin: 10,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-end'
+            }}
+          >
+            <div>
+              <Title>{shop.name}</Title>
+              <Description>{shop.address}</Description>
+            </div>
+            <Grid container justify="flex-end">
+              <StyledLink to={'/shops/' + shop.id.toString() + '/edit'}>
+                <Button variant="outlined" style={{ marginRight: 10 }}>
+                  編集
+                </Button>
+              </StyledLink>
+              <StyledLink to={'/shops/' + shop.id.toString() + '/delete'}>
+                <Button variant="outlined" color="secondary">
+                  削除
+                </Button>
+              </StyledLink>
+            </Grid>
+          </Block>
+        </Section>
+        <Section>
+          <Title>取扱商品</Title>
+          {this.state.shop.stocks && (
+            <ProductList
+              products={
+                this.state.shop.stocks.map(
+                  stock => stock.product
+                ) as ProductDto[]
+              }
+            />
+          )}
+        </Section>
+        <Loading loading={this.state.loading} />
+      </Background>
+    )
   }
 }
 

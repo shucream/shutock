@@ -5,25 +5,29 @@ import Section from '../components/atoms/Section'
 import { ProductDto } from '../dto/ProductDto'
 import ProductList from '../components/organisms/ProductList'
 import ApiClient from '../lib/ApiClient'
+import Loading from '../components/atoms/Loading'
 
 type Props = RouteComponentProps
 
 interface State {
   results: ProductDto[]
+  loading: boolean
 }
 
 class ProductListScreen extends React.Component<Props, State> {
   public state: State = {
-    results: []
+    results: [],
+    loading: false
   }
 
-  public componentDidMount(): void {
-    ApiClient.get<ProductDto[]>('/v1/products/').then(response => {
-      if (response.success) {
-        console.log(response.data)
-        this.setState({ results: response.data })
-      }
-    })
+  public async componentDidMount() {
+    this.setState({ loading: true })
+    const response = await ApiClient.get<ProductDto[]>('/v1/products/')
+    if (response.success) {
+      this.setState({ results: response.data, loading: false })
+    } else {
+      console.log(response.detail)
+    }
   }
 
   public render() {
@@ -33,6 +37,7 @@ class ProductListScreen extends React.Component<Props, State> {
         <Section>
           <ProductList products={this.state.results} />
         </Section>
+        <Loading loading={this.state.loading} />
       </Background>
     )
   }
@@ -40,7 +45,6 @@ class ProductListScreen extends React.Component<Props, State> {
 
 const Background = styled.div`
   width: 100%;
-  height: 100px;
 `
 
 export default ProductListScreen

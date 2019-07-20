@@ -4,25 +4,28 @@ import ApiClient from '../lib/ApiClient'
 import { ShopDto } from '../dto/ShopDto'
 import ShopList from '../components/organisms/ShopList'
 import Section from '../components/atoms/Section'
+import Loading from '../components/atoms/Loading'
 
 interface Props {}
 
 interface State {
   results: ShopDto[]
+  loading: boolean
 }
 
 class ShopListScreen extends React.Component<Props, State> {
   public state: State = {
-    results: []
+    results: [],
+    loading: false
   }
 
-  public componentDidMount(): void {
-    ApiClient.get<ShopDto[]>('/v1/shops/').then(response => {
-      if (response.success) {
-        console.log(response.data)
-        this.setState({ results: response.data })
-      }
-    })
+  public async componentDidMount() {
+    const response = await ApiClient.get<ShopDto[]>('/v1/shops/')
+    if (response.success) {
+      this.setState({ results: response.data })
+    } else {
+      console.log(response.detail)
+    }
   }
 
   public render() {
@@ -32,6 +35,7 @@ class ShopListScreen extends React.Component<Props, State> {
         <Section>
           <ShopList shops={this.state.results} />
         </Section>
+        <Loading loading={this.state.loading} />
       </Background>
     )
   }
