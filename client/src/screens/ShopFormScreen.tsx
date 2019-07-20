@@ -6,22 +6,25 @@ import Description from '../components/atoms/Description'
 import Section from '../components/atoms/Section'
 import Container from '../components/atoms/Container'
 import ApiClient from '../lib/ApiClient'
-import { RouteComponentProps } from 'react-router';
-import { ShopDto, ShopImageDto } from '../dto/ShopDto';
+import { RouteComponentProps, withRouter } from 'react-router'
+import { ShopDto, ShopImageDto } from '../dto/ShopDto'
+import { FailureResponse } from '../lib/FailureResponse'
+import { SuccessResponse } from '../lib/SuccessResponse'
 
-type Props = RouteComponentProps<{id?: string}>;
+type Props = RouteComponentProps<{ id?: string }>
 
 interface State {
   name: string
   address: string
   images: File[]
   imageList: ShopImageDto[]
-  config: ModeConfig
+  mode: Mode
+  loading: boolean
 }
 
-interface Mode {
-  new: ModeConfig
-  edit: ModeConfig
+enum Mode {
+  new,
+  edit
 }
 
 interface ModeConfig {
@@ -31,14 +34,14 @@ interface ModeConfig {
   preset: boolean
 }
 
-const modeConfig: Mode = {
-  new: {
+const ModeData: { [key: string]: ModeConfig } = {
+  [Mode.new]: {
     title: '新規店鋪登録',
     subtitle: '新しい店鋪を登録します。',
     submitLabel: '登録',
-    preset: false,
+    preset: false
   },
-  edit: {
+  [Mode.edit]: {
     title: '店鋪編集',
     subtitle: '店鋪の情報を更新します。',
     submitLabel: '更新',
@@ -51,34 +54,24 @@ const initialState: State = {
   address: '',
   images: [],
   imageList: [],
-  config: modeConfig.new
+  mode: Mode.new,
+  loading: false
 }
 
 class ShopFormScreen extends React.Component<Props, State> {
   public state: State = initialState
 
-  componentDidMount(): void {
-    if (this.props.match.params.id) {
-      this.setState({config: modeConfig.edit})
-      ApiClient.get<ShopDto>(`/v1/shops/${this.props.match.params.id.toString()}`)
-        .then(response => {
-          if (response.success) {
-            this.setState({
-              name: response.data.name,
-              address: response.data.address,
-              images: [],
-              imageList: response.data.shop_images
-            })
-          } else {
-            console.log(response.detail)
-          }
-        })
-    }
+  async componentDidMount() {
+    this.setState({ loading: true })
+    await this.setMode()
+    this.setState({ loading: false })
   }
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+  public async componentDidUpdate(prevProps: Readonly<Props>) {
     if (this.props.match.params.id !== prevProps.match.params.id) {
-      this.setState(initialState)
+      this.setState({ loading: true })
+      await this.setMode()
+      this.setState({ loading: false })
     }
   }
 
@@ -86,8 +79,8 @@ class ShopFormScreen extends React.Component<Props, State> {
     return (
       <Container>
         <Section>
-          <Title>{this.state.config.title}</Title>
-          <Description>{this.state.config.subtitle}</Description>
+          <Title>{ModeData[this.state.mode].title}</Title>
+          <Description>{ModeData[this.state.mode].subtitle}</Description>
         </Section>
         <Section>
           <TextField
@@ -116,7 +109,7 @@ class ShopFormScreen extends React.Component<Props, State> {
         </Section>
         <Section>
           <Button variant="outlined" onClick={this.submit}>
-            {this.state.config.submitLabel}
+            {ModeData[this.state.mode].submitLabel}
           </Button>
         </Section>
       </Container>
@@ -140,29 +133,52 @@ class ShopFormScreen extends React.Component<Props, State> {
     }
   }
 
-  private submit = () => {
+  private submit = async () => {
+    this.setState({ loading: true })
     const formData = new FormData()
     formData.append('name', this.state.name)
     formData.append('address', this.state.address)
     this.state.images.forEach(image => {
       formData.append('images[]', image)
     })
+    let response: FailureResponse | SuccessResponse<ShopDto>
     if (this.props.match.params.id) {
-      ApiClient.patchData(`/v1/shops/${this.props.match.params.id}`, formData).then(response => {
-        if (response.success) {
-          console.log(response.data)
-        } else {
-          console.log(response.detail)
-        }
-      })
-    } else { ApiClient.postData('/v1/shops/', formData).then(response => {
+      response = await ApiClient.patchData(
+        `/v1/shops/${this.props.match.params.id}`,
+        formData
+      )
+    } else {
+      response = await ApiClient.postData('/v1/shops/', formData)
+    }
+    this.setState({ loading: false })
+    if (response.success) {
+      const shopId = response.data.id
+      this.props.history.push(`/shops/${shopId}`)
+    } else {
+      console.log(response.detail)
+    }
+  }
+
+  private setMode = async () => {
+    if (this.props.match.params.id) {
+      this.setState({ mode: Mode.edit })
+      const response = await ApiClient.get<ShopDto>(
+        `/v1/shops/${this.props.match.params.id.toString()}`
+      )
       if (response.success) {
-        console.log(response.data)
+        this.setState({
+          name: response.data.name,
+          address: response.data.address,
+          images: [],
+          imageList: response.data.shop_images
+        })
       } else {
         console.log(response.detail)
       }
-    })}
+    } else {
+      this.setState(initialState)
+    }
   }
 }
 
-export default ShopFormScreen
+export default withRouter(ShopFormScreen)

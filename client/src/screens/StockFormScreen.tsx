@@ -8,19 +8,15 @@ import { ShopDto } from '../dto/ShopDto'
 import { Button, MenuItem, Paper, Popper, TextField } from '@material-ui/core'
 import ApiClient from '../lib/ApiClient'
 import _ from 'lodash'
+import SuggestInput from '../components/molecules/SuggestInput'
+import { RouteComponentProps, RouterProps, withRouter } from 'react-router'
 
-interface Props {}
+type Props = RouteComponentProps
 
 interface State {
   product: ProductDto | null
-  productValue: string
-  productList: ProductDto[]
   shop: ShopDto | null
-  shopValue: string
-  shopList: ShopDto[]
   quantity: string
-  activeInput: any | null
-  activeInputType: '' | 'product' | 'shop'
 }
 
 const ENTER_KEY = 13
@@ -28,14 +24,8 @@ const ENTER_KEY = 13
 class StockFormScreen extends React.Component<Props, State> {
   public state: State = {
     product: null,
-    productValue: '',
-    productList: [],
     shop: null,
-    shopValue: '',
-    shopList: [],
-    quantity: '',
-    activeInput: null,
-    activeInputType: ''
+    quantity: ''
   }
 
   public render() {
@@ -47,60 +37,21 @@ class StockFormScreen extends React.Component<Props, State> {
           </Section>
           <Section style={{ flexDirection: 'row' }}>
             <Block>
-              <TextField
+              <SuggestInput
                 label="店鋪名"
-                value={
-                  (this.state.shop && this.state.shop.name) ||
-                  this.state.shopValue
-                }
-                onChange={this.handleShopValue.bind(this)}
-                onKeyDown={this.handleEnterKey('shop').bind(this)}
-                margin="normal"
+                submit={this.handleShopId.bind(this)}
+                suggestApiPath={'/v1/search/shops'}
                 style={{ marginTop: 0, maxWidth: 300 }}
               />
             </Block>
             <Block>
-              <TextField
+              <SuggestInput
                 label="商品名"
-                value={
-                  (this.state.product && this.state.product.name) ||
-                  this.state.productValue
-                }
-                onChange={this.handleProductValue.bind(this)}
-                onKeyDown={this.handleEnterKey('product').bind(this)}
-                margin="normal"
+                submit={this.handleProductId.bind(this)}
+                suggestApiPath={'/v1/search/products'}
                 style={{ marginTop: 0, maxWidth: 300 }}
               />
             </Block>
-            <Popper
-              anchorEl={this.state.activeInput}
-              open={Boolean(this.state.activeInput)}
-            >
-              <Paper
-                square
-                style={{
-                  marginTop: 8,
-                  width: this.state.activeInput
-                    ? this.state.activeInput.clientWidth
-                    : undefined
-                }}
-              >
-                {(this.state.activeInputType === 'shop' &&
-                  this.state.shopList.map(suggestion => (
-                    <MenuItem onClick={this.handleShopAutoComplete(suggestion)}>
-                      {suggestion.name}
-                    </MenuItem>
-                  ))) ||
-                  (this.state.activeInputType === 'product' &&
-                    this.state.productList.map(suggestion => (
-                      <MenuItem
-                        onClick={this.handleProductAutoComplete(suggestion)}
-                      >
-                        {suggestion.name}
-                      </MenuItem>
-                    )))}
-              </Paper>
-            </Popper>
           </Section>
           <Section>
             <Block>
@@ -125,75 +76,12 @@ class StockFormScreen extends React.Component<Props, State> {
     )
   }
 
-  public handleShopValue = (event: ChangeEvent<HTMLInputElement>) => {
-    this.setState({
-      shopValue: event.target.value,
-      activeInput: event.currentTarget,
-      activeInputType: 'shop'
-    })
-    console.log(this.state)
-    _.throttle(this.searchShop.bind(this), 700)
+  private handleShopId = (entity: any) => {
+    this.setState({ shop: entity as ShopDto })
   }
 
-  public handleProductValue = (event: ChangeEvent<HTMLInputElement>) => {
-    this.setState({
-      productValue: event.target.value,
-      activeInput: event.currentTarget,
-      activeInputType: 'product'
-    })
-    console.log(this.state)
-    _.throttle(this.searchProduct.bind(this), 700)
-  }
-
-  public searchShop = () => {
-    ApiClient.get<ShopDto[]>(`/v1/search/shops?q=${this.state.shopValue}`).then(
-      response => {
-        if (response.success) {
-          console.log(response)
-          this.setState({ shopList: response.data })
-        } else {
-          console.log(response.detail)
-        }
-      }
-    )
-  }
-
-  public searchProduct = () => {
-    ApiClient.get<ProductDto[]>(
-      `/v1/search/products?q=${this.state.productValue}`
-    ).then(response => {
-      if (response.success) {
-        console.log(response)
-        this.setState({ productList: response.data })
-      } else {
-        console.log(response.detail)
-      }
-    })
-  }
-
-  private handleShopAutoComplete = (data: ShopDto) => () => {
-    this.setState({ shop: data, activeInputType: '' })
-  }
-
-  private handleProductAutoComplete = (data: ProductDto) => () => {
-    this.setState({ product: data, activeInputType: '' })
-  }
-
-  private handleClose() {
-    this.setState({ activeInput: null, shopList: [], productList: [] })
-  }
-
-  private handleEnterKey = (target: 'shop' | 'product') => (
-    event: React.KeyboardEvent<HTMLInputElement>
-  ) => {
-    if (event.keyCode === ENTER_KEY) {
-      this.setState({ activeInputType: target })
-      if (target === 'shop') {
-        this.searchShop()
-      } else {
-        this.searchProduct()
-      }
-    }
+  private handleProductId = (entity: any) => {
+    this.setState({ product: entity as ProductDto })
   }
 
   private handleQuantity = (event: ChangeEvent<HTMLInputElement>) => {
@@ -213,7 +101,7 @@ class StockFormScreen extends React.Component<Props, State> {
       }
       ApiClient.post('/v1/stocks', json).then(response => {
         if (response.success) {
-          console.log(response.data)
+          this.props.history.push('/')
         } else {
           console.log(response.detail)
         }
@@ -232,4 +120,4 @@ const Block = styled.div`
   min-width: 300px;
 `
 
-export default StockFormScreen
+export default withRouter(StockFormScreen)

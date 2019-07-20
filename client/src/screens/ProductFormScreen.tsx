@@ -7,8 +7,10 @@ import Section from '../components/atoms/Section'
 import TextFieldRow from '../components/atoms/TextFieldRow'
 import ImageDropZone from '../components/molecules/ImageDropZone'
 import ApiClient from '../lib/ApiClient'
-import { RouteComponentProps } from 'react-router'
+import { RouteComponentProps, withRouter } from 'react-router'
 import { ProductDto, ProductImageDto } from '../dto/ProductDto'
+import { FailureResponse } from '../lib/FailureResponse'
+import { SuccessResponse } from '../lib/SuccessResponse'
 
 type Props = RouteComponentProps<{ id?: string }>
 
@@ -18,33 +20,31 @@ interface State {
   price: string
   images: File[]
   imageList: ProductImageDto[]
-  config: ModeConfig
+  mode: Mode
+  loading: boolean
 }
 
-interface Mode {
-  new: ModeConfig
-  edit: ModeConfig
+enum Mode {
+  new,
+  edit
 }
 
 interface ModeConfig {
   title: string
   subtitle: string
   submitLabel: string
-  preset: boolean
 }
 
-const modeConfig: Mode = {
-  new: {
+const ModeData: { [key: string]: ModeConfig } = {
+  [Mode.new]: {
     title: '新規商品登録',
     subtitle: '新しい商品を登録します。',
-    submitLabel: '登録',
-    preset: false
+    submitLabel: '登録'
   },
-  edit: {
+  [Mode.edit]: {
     title: '商品編集',
     subtitle: '商品の情報を更新します。',
-    submitLabel: '更新',
-    preset: true
+    submitLabel: '更新'
   }
 }
 
@@ -54,38 +54,36 @@ const initialState: State = {
   price: '',
   images: [],
   imageList: [],
-  config: modeConfig.new
+  mode: Mode.new,
+  loading: false
 }
 
 class ProductFormScreen extends React.Component<Props, State> {
   public state: State = initialState
 
-  componentDidMount(): void {
+  public async componentDidMount() {
     if (this.props.match.params.id) {
-      this.setState({ config: modeConfig.edit })
-      ApiClient.get<ProductDto>(
+      this.setState({ mode: Mode.edit, loading: true })
+      const response = await ApiClient.get<ProductDto>(
         `/v1/products/${this.props.match.params.id.toString()}`
-      ).then(response => {
-        if (response.success) {
-          this.setState({
-            name: response.data.name,
-            description: response.data.description,
-            price: response.data.price.toString(),
-            images: [],
-            imageList: response.data.product_images
-          })
-        } else {
-          console.log(response.detail)
-        }
-      })
+      )
+      if (response.success) {
+        const product = response.data
+        this.setState({
+          name: product.name,
+          description: product.description,
+          price: product.price.toString(),
+          images: [],
+          imageList: response.data.product_images,
+          loading: false
+        })
+      } else {
+        console.log(response.detail)
+      }
     }
   }
 
-  componentDidUpdate(
-    prevProps: Readonly<Props>,
-    prevState: Readonly<State>,
-    snapshot?: any
-  ): void {
+  public componentDidUpdate(prevProps: Readonly<Props>): void {
     if (this.props.match.params.id !== prevProps.match.params.id) {
       this.setState(initialState)
     }
@@ -95,8 +93,8 @@ class ProductFormScreen extends React.Component<Props, State> {
     return (
       <Container>
         <Section>
-          <Title>{this.state.config.title}</Title>
-          <Description>{this.state.config.subtitle}</Description>
+          <Title>{ModeData[this.state.mode].title}</Title>
+          <Description>{ModeData[this.state.mode].subtitle}</Description>
         </Section>
         <Section>
           <TextField
@@ -135,7 +133,7 @@ class ProductFormScreen extends React.Component<Props, State> {
         </Section>
         <Section>
           <Button variant="outlined" onClick={this.submit}>
-            {this.state.config.submitLabel}
+            {ModeData[this.state.mode].submitLabel}
           </Button>
         </Section>
       </Container>
@@ -149,18 +147,11 @@ class ProductFormScreen extends React.Component<Props, State> {
   private handleChange = (key: keyof State) => (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    if (typeof this.state[key] === 'string') {
-      // @ts-ignore
-      this.setState({ [key]: event.target.value.toString() })
-    }
-    if (typeof this.state[key] === 'number') {
-      // @ts-ignore
-      this.setState({ [key]: Number.parseInt(event.target.value) })
-    }
+    // @ts-ignore
+    this.setState({ [key]: event.target.value })
   }
 
-  private submit = () => {
-    console.log(this.state)
+  private submit = async () => {
     const formData = new FormData()
     formData.append('name', this.state.name)
     formData.append('description', this.state.description)
@@ -168,27 +159,23 @@ class ProductFormScreen extends React.Component<Props, State> {
     this.state.images.forEach(file => {
       formData.append('images[]', file)
     })
+    let response: FailureResponse | SuccessResponse<ProductDto>
     if (this.props.match.params.id) {
-      ApiClient.patchData(
+      response = await ApiClient.patchData<ProductDto>(
         `/v1/products/${this.props.match.params.id}`,
         formData
-      ).then(response => {
-        if (response.success) {
-          console.log(response.data)
-        } else {
-          console.log(response.detail)
-        }
-      })
+      )
     } else {
-      ApiClient.postData('/v1/products/', formData).then(response => {
-        if (response.success) {
-          console.log(response.data)
-        } else {
-          console.log(response.detail)
-        }
-      })
+      response = await ApiClient.postData<ProductDto>('/v1/products/', formData)
+    }
+    this.setState({ loading: false })
+    if (response.success) {
+      const productId = response.data.id
+      this.props.history.push(`/products/${productId}`)
+    } else {
+      console.log(response.detail)
     }
   }
 }
 
-export default ProductFormScreen
+export default withRouter(ProductFormScreen)
