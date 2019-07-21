@@ -18,8 +18,8 @@ const ProductListItem: React.FC<Props> = props => {
   const { product } = props
 
   return (
-    <Card style={{ width: 300, margin: 10 }}>
-      <StyledLink to={'/products/' + product.id.toString()}>
+    <StyledLink to={'/products/' + product.id.toString()}>
+      <Card style={{ width: 300, margin: 10 }}>
         <CardActionArea>
           <CardMedia
             image={
@@ -34,15 +34,15 @@ const ProductListItem: React.FC<Props> = props => {
               <Typography variant="body1" component="p">
                 {product.name}
               </Typography>
-              <span>{product.price}</span>
+              <span>{product.price}円</span>
             </Grid>
             <Typography variant="body2" color="textSecondary" component="p">
               {product.description}
             </Typography>
           </CardContent>
         </CardActionArea>
-      </StyledLink>
-    </Card>
+      </Card>
+    </StyledLink>
   )
 }
 

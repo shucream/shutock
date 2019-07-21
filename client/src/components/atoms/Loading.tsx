@@ -4,14 +4,15 @@ import { CircularProgress } from '@material-ui/core'
 
 interface Props {
   loading: boolean
+  size?: number
 }
 
 const Loading: React.FC<Props> = props => {
-  const { loading } = props
+  const { loading, size } = props
   if (loading) {
     return (
       <Wrapper>
-        <CircularProgress />
+        <CircularProgress size={size} />
       </Wrapper>
     )
   } else {

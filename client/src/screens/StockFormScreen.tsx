@@ -19,8 +19,6 @@ interface State {
   quantity: string
 }
 
-const ENTER_KEY = 13
-
 class StockFormScreen extends React.Component<Props, State> {
   public state: State = {
     product: null,

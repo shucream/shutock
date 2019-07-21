@@ -3,7 +3,8 @@ import styled from 'styled-components'
 import { MenuItem, Paper, Popper, TextField } from '@material-ui/core'
 import _ from 'lodash'
 import ApiClient from '../../lib/ApiClient'
-import { ShopDto } from '../../dto/ShopDto'
+import Loading from '../atoms/Loading'
+import { CheckCircleOutline } from '@material-ui/icons'
 
 interface Entity {
   id: number
@@ -23,6 +24,7 @@ interface State {
   targetEntity: Entity | null
   entities: Entity[]
   targetElement: HTMLInputElement | null
+  loading: boolean
 }
 
 const ENTER_KEY = 13
@@ -34,6 +36,14 @@ const ENTER_KEY = 13
  * を持つ必要があります。
  */
 export default class SuggestInput extends React.Component<Props, State> {
+  public state: State = {
+    value: '',
+    targetEntity: null,
+    entities: [],
+    targetElement: null,
+    loading: false
+  }
+
   public render() {
     return (
       <Background style={this.props.style}>
@@ -47,6 +57,9 @@ export default class SuggestInput extends React.Component<Props, State> {
           onKeyDown={this.handleEnterKey.bind(this)}
           margin="normal"
           style={{ marginTop: 0, maxWidth: 300 }}
+        />
+        <CheckCircleOutline
+          color={Boolean(this.state.targetEntity) ? 'primary' : 'disabled'}
         />
         <Popper
           anchorEl={this.state.targetElement}
@@ -66,8 +79,10 @@ export default class SuggestInput extends React.Component<Props, State> {
                 {suggestionEntity.name}
               </MenuItem>
             ))}
-            {this.state.entities.length || (
-              <MenuItem>候補がありません</MenuItem>
+            {this.state.entities.length ? null : (
+              <MenuItem>
+                <Loading loading={this.state.loading} size={30} />
+              </MenuItem>
             )}
           </Paper>
         </Popper>
@@ -80,7 +95,7 @@ export default class SuggestInput extends React.Component<Props, State> {
       value: event.target.value,
       targetElement: event.currentTarget
     })
-    _.throttle(this.search.bind(this), 700)
+    _.debounce(this.search.bind(this), 500)()
   }
 
   private handleEnterKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -94,6 +109,7 @@ export default class SuggestInput extends React.Component<Props, State> {
   }
 
   private search = async () => {
+    this.setState({ loading: true })
     const response = await ApiClient.get<Entity[]>(
       `${this.props.suggestApiPath}?q=${this.state.value}`
     )
@@ -102,6 +118,7 @@ export default class SuggestInput extends React.Component<Props, State> {
     } else {
       console.log(response.detail)
     }
+    this.setState({ loading: false })
   }
 
   private handleDecide = (entity: Entity) => () => {
@@ -113,4 +130,8 @@ export default class SuggestInput extends React.Component<Props, State> {
 
 const Background = styled.div`
   flex: 1;
+  display: flex
+  flex-direction: row;
+  align-items: center;
+  jusitfy-content: flex-start;
 `

@@ -26,8 +26,7 @@ services:
         ports:
             - "80:80"
         environment:
-            - CLIENT_HOST=192.168.179.7:3001
-
+            - CLIENT_HOST=192.168.179.7:3001 # PCのIP
         networks:
           - shutock_network
 

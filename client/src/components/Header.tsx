@@ -68,19 +68,25 @@ class Header extends React.Component<Props, State> {
               to={'/products/new'}
               style={{ textDecoration: 'none', color: 'black' }}
             >
-              <MenuItem>add Product</MenuItem>
+              <MenuItem onClick={this.handleClose.bind(this)}>
+                add Product
+              </MenuItem>
             </Link>
             <Link
               to={'/shops/new'}
               style={{ textDecoration: 'none', color: 'black' }}
             >
-              <MenuItem>add Shop</MenuItem>
+              <MenuItem onClick={this.handleClose.bind(this)}>
+                add Shop
+              </MenuItem>
             </Link>
             <Link
               to={'/stocks/new'}
               style={{ textDecoration: 'none', color: 'black' }}
             >
-              <MenuItem>add Stock</MenuItem>
+              <MenuItem onClick={this.handleClose.bind(this)}>
+                add Stock
+              </MenuItem>
             </Link>
           </Menu>
         </RightContents>
