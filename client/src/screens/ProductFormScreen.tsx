@@ -11,6 +11,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import { ProductDto, ProductImageDto } from '../dto/ProductDto'
 import { FailureResponse } from '../lib/FailureResponse'
 import { SuccessResponse } from '../lib/SuccessResponse'
+import Loading from '../components/atoms/Loading'
 
 type Props = RouteComponentProps<{ id?: string }>
 
@@ -136,6 +137,7 @@ class ProductFormScreen extends React.Component<Props, State> {
             {ModeData[this.state.mode].submitLabel}
           </Button>
         </Section>
+        <Loading loading={this.state.loading} />
       </Container>
     )
   }
