@@ -5,11 +5,10 @@ import Title from '../components/atoms/Title'
 import Container from '../components/atoms/Container'
 import { ProductDto } from '../dto/ProductDto'
 import { ShopDto } from '../dto/ShopDto'
-import { Button, MenuItem, Paper, Popper, TextField } from '@material-ui/core'
+import { Button, TextField } from '@material-ui/core'
 import ApiClient from '../lib/ApiClient'
-import _ from 'lodash'
 import SuggestInput from '../components/molecules/SuggestInput'
-import { RouteComponentProps, RouterProps, withRouter } from 'react-router'
+import { RouteComponentProps, withRouter } from 'react-router'
 
 type Props = RouteComponentProps
 
